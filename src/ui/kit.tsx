@@ -25,6 +25,8 @@ const PATHS: Record<string, string> = {
   flecha: 'M4 10h12m-4-4 4 4-4 4',
   intercambio: 'M4 7h12l-3.5-3.5M16 13H4l3.5 3.5',
   mas: 'M10 4v12M4 10h12',
+  candado: 'M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v8h-11z',
+  proyecto: 'M3 5.5h5l1.5 2H17v9H3zM3 9.5h14',
   menos: 'M4 10h12',
   play: 'M6 4.5v11l9-5.5z',
   stop: 'M5 5h10v10H5z',
@@ -141,7 +143,7 @@ export function Campo({ l, v, u, paso = 1, onChange, invalido }: { l: string; v:
         <input
           type="number"
           step={paso}
-          value={Number.isNaN(v) ? '' : v}
+          value={Number.isFinite(v) ? v : ''}
           aria-invalid={invalido || undefined}
           onChange={(e) => onChange(e.target.valueAsNumber)}
           className="w-full min-w-0 h-full bg-transparent px-2 text-[13.5px] outline-none"

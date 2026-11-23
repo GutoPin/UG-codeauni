@@ -12,6 +12,7 @@ import Intercambio from './screens/stp/Intercambio'
 import Calculadora, { MODULOS } from './screens/modulos/Calculadora'
 import DisenoLabor from './screens/designer/Labor'
 import DisenoTajeo from './screens/designer/Tajeo'
+import DisenoProyecto from './screens/designer/Proyecto'
 
 const Visor = lazy(() => import('./screens/Visor'))
 // echarts solo se descarga al abrir Cumplimiento
@@ -31,6 +32,7 @@ const STP = [
 const DESIGNER = [
   { r: '/designer/labor', l: 'Constructor de labor', i: 'designer' },
   { r: '/designer/tajeo', l: 'Tajeo paramétrico', i: 'cubo' },
+  { r: '/designer/proyecto', l: 'Proyecto y versiones', i: 'proyecto' },
 ]
 
 function Enlace({ r, actual, icono, children, sub }: { r: string; actual: string; icono: string; children: ReactNode; sub?: ReactNode }) {
@@ -62,6 +64,7 @@ export default function App() {
     if (ruta === '/stp/intercambio') return <Intercambio />
     if (ruta === '/designer/labor') return <DisenoLabor />
     if (ruta === '/designer/tajeo') return <DisenoTajeo />
+    if (ruta === '/designer/proyecto') return <DisenoProyecto />
     if (ruta === '/mina') return <Suspense><Visor /></Suspense>
     const m = MODULOS.find((x) => `/modulo/${x.id}` === ruta)
     if (m) return <Calculadora key={m.id} modulo={m} />

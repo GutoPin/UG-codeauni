@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useDisenos, type ClaseLabor } from '../../disenos'
 import { fmt } from '../../derive'
-import { areaSeccion, contornoSeccion, ejeDeTramos, validarTramos, type Forma, type Reglas, type Seccion, type Tramo } from '../../domain/designer'
+import { areaSeccion, contornoSeccion, ejeDeTramos, validarTramos, type Forma, type Seccion, type Tramo } from '../../domain/designer'
 import { Boton, Cabecera, Campo, Icon, Panel, Segmentos } from '../../ui/kit'
+import BarraDiseno, { useEditable } from './BarraDiseno'
 
 // Biblioteca de secciones tipo (catálogo semilla de la ficha 02). Herradura: alto total = pared + medio ancho.
 const BIBLIOTECA: { n: string; s: Seccion }[] = [
@@ -9,14 +10,6 @@ const BIBLIOTECA: { n: string; s: Seccion }[] = [
   { n: 'Herradura 3,5 × 3,5', s: { forma: 'herradura', ancho: 3.5, alto: 1.75, sobre: 0.15 } },
   { n: 'Rampa 5 × 4,5', s: { forma: 'herradura', ancho: 5, alto: 2, sobre: 0.2 } },
   { n: 'Chimenea 2,4 × 2,4', s: { forma: 'rectangular', ancho: 2.4, alto: 2.4, sobre: 0.1 } },
-]
-
-const RAMPA: Tramo[] = [
-  { tipo: 'recta', largo: 40, gradiente: 12 },
-  { tipo: 'curva', radio: 15, giro: 180, gradiente: 12 },
-  { tipo: 'recta', largo: 40, gradiente: 12 },
-  { tipo: 'curva', radio: 15, giro: 180, gradiente: 12 },
-  { tipo: 'recta', largo: 40, gradiente: 12 },
 ]
 
 function SeccionSVG({ s }: { s: Seccion }) {
@@ -39,14 +32,17 @@ function SeccionSVG({ s }: { s: Seccion }) {
 }
 
 export default function Labor() {
-  const [seccion, setSeccion] = useState<Seccion>(BIBLIOTECA[2].s)
-  const [reglas, setReglas] = useState<Reglas>({ gradienteMax: 15, radioMin: 12 })
-  const [densidad, setDensidad] = useState(2.8)
-  const [cota, setCota] = useState(3750)
-  const [tramos, setTramos] = useState<Tramo[]>(RAMPA)
+  const { labor, editar } = useDisenos()
+  const editable = useEditable('labor')
+  const dl = labor.datos
+  const { seccion, reglas, densidad, tramos, rumbo } = dl
+  const [ox, oy, cota] = dl.origen
+  const set = (p: Partial<typeof dl>) => editar({ ...dl, ...p })
+  const setSeccion = (seccion: Seccion) => set({ seccion })
+  const setTramos = (tramos: Tramo[]) => set({ tramos })
 
   const area = areaSeccion(seccion)
-  const eje = ejeDeTramos([0, 0, cota], 0, tramos)
+  const eje = ejeDeTramos(dl.origen, rumbo, tramos)
   const errores = validarTramos(tramos, reglas)
   const malos = new Set(errores.map((e) => e.tramo))
   const cambiar = (i: number, t: Partial<Tramo>) => setTramos(tramos.map((x, j) => (j === i ? ({ ...x, ...t } as Tramo) : x)))
@@ -84,7 +80,8 @@ export default function Labor() {
   return (
     <div className="pb-10">
       <Cabecera titulo="Constructor de labor" detalle="Designer UG · eje por tramos con sección tipo y reglas del proyecto validadas mientras se dibuja" />
-      <div className="px-6 grid grid-cols-12 gap-4 items-start">
+      <BarraDiseno tipo="labor" />
+      <fieldset disabled={!editable} className="min-w-0 px-6 grid grid-cols-12 gap-4 items-start [&_input:disabled]:opacity-60">
         <div className="col-span-4 max-[1200px]:col-span-12 space-y-4">
           <Panel titulo="Sección tipo">
             <div className="p-4 space-y-3">
@@ -138,10 +135,11 @@ export default function Labor() {
           </Panel>
 
           <Panel titulo="Reglas del proyecto">
-            <div className="p-4 grid grid-cols-3 gap-2">
-              <Campo l="Gradiente máx." u="%" paso={0.5} v={reglas.gradienteMax} onChange={(gradienteMax) => setReglas({ ...reglas, gradienteMax })} />
-              <Campo l="Radio mínimo" u="m" v={reglas.radioMin} onChange={(radioMin) => setReglas({ ...reglas, radioMin })} />
-              <Campo l="Densidad roca" u="t/m³" paso={0.1} v={densidad} onChange={setDensidad} />
+            <div className="p-4 grid grid-cols-2 gap-2">
+              <Campo l="Gradiente máx." u="%" paso={0.5} v={reglas.gradienteMax} onChange={(gradienteMax) => set({ reglas: { ...reglas, gradienteMax } })} />
+              <Campo l="Radio mínimo" u="m" v={reglas.radioMin} onChange={(radioMin) => set({ reglas: { ...reglas, radioMin } })} />
+              <Campo l="Densidad roca" u="t/m³" paso={0.1} v={densidad} onChange={(densidad) => set({ densidad })} />
+              <Campo l="Pilar mínimo" u="m" paso={0.5} v={dl.pilarMin} onChange={(pilarMin) => set({ pilarMin })} />
             </div>
           </Panel>
         </div>
@@ -160,9 +158,20 @@ export default function Labor() {
               </div>
             }
           >
-            <div className="px-4 pt-3 grid grid-cols-[140px_1fr] gap-3 items-end">
-              <Campo l="Cota de inicio" u="m" v={cota} onChange={setCota} />
-              <p className="text-[12px] text-tinta-3 pb-1.5">Giro positivo a la izquierda. La gradiente se valida contra la máxima y el radio contra el mínimo del equipo de diseño.</p>
+            <div className="px-4 pt-3 space-y-2.5">
+              <Segmentos<ClaseLabor>
+                etiqueta="Tipo de labor"
+                valor={dl.clase}
+                onChange={(clase) => set({ clase })}
+                opciones={(['Rampa', 'Galería', 'Crucero', 'Chimenea'] as const).map((v) => ({ v, l: v }))}
+              />
+              <div className="grid grid-cols-[repeat(4,minmax(0,120px))_1fr] gap-2 items-end">
+                <Campo l="Inicio x (rumbo)" u="m" paso={5} v={ox} onChange={(x) => set({ origen: [x, oy, cota] })} />
+                <Campo l="Inicio y" u="m" paso={5} v={oy} onChange={(y) => set({ origen: [ox, y, cota] })} />
+                <Campo l="Cota de inicio" u="m" v={cota} onChange={(z) => set({ origen: [ox, oy, z] })} />
+                <Campo l="Rumbo inicial" u="°" paso={15} v={rumbo} onChange={(rumbo) => set({ rumbo })} />
+                <p className="text-[12px] text-tinta-3 pb-1.5">Coordenadas de la mina piloto: x a lo largo de la veta, y transversal. Rumbo 0° = +x; giro positivo a la izquierda.</p>
+              </div>
             </div>
             <table className="w-full text-[13px] mt-2">
               <thead>
@@ -247,7 +256,7 @@ export default function Labor() {
                   {trazos((p) => `${((p[0] - x0) * kp).toFixed(1)},${((p[1] - y0) * kp).toFixed(1)}`).map((s) => (
                     <path key={s.t} d={s.d} fill="none" stroke={malos.has(s.t) ? 'var(--color-critico)' : 'var(--color-tinta)'} strokeWidth={1.2} />
                   ))}
-                  <circle cx={(0 - x0) * kp} cy={(0 - y0) * kp} r={4} fill="var(--color-coral)" />
+                  <circle cx={(ox - x0) * kp} cy={(oy - y0) * kp} r={4} fill="var(--color-coral)" />
                 </g>
               </svg>
               <p className="px-4 pb-3 text-[11.5px] text-tinta-3">Punto coral = inicio. Ancho dibujado a escala de la sección.</p>
@@ -272,7 +281,7 @@ export default function Labor() {
             </Panel>
           </div>
         </div>
-      </div>
+      </fieldset>
     </div>
   )
 }

@@ -1,14 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { LABORES, LARGO_VETA, NIVELES, generarBloques } from '../../data/minaPiloto'
 import { fmt } from '../../derive'
+import { TAJEO_INICIAL, useDisenos, vetaY } from '../../disenos'
 import { centroTajeo, evaluarTajeo, interferenciasTajeo, type Tajeo as T } from '../../domain/designer'
 import { Boton, Cabecera, Campo, Icon, Panel } from '../../ui/kit'
+import BarraDiseno, { useEditable } from './BarraDiseno'
 
 const BLOQUES = generarBloques()
 // mismos límites que el generador del modelo de bloques (centros ± medio bloque)
 const LIMITES: [number, number, number, number] = [-12.5, LARGO_VETA + 12.5, 3732.5, 3917.5]
 const TAJEOS = LABORES.filter((l) => l.tipo === 'Tajeo').map((l) => ({ id: l.id, nombre: l.nombre, caja: l.caja! }))
-const vetaY = (z: number) => 3 * Math.sin(z / 30)
 
 // misma rampa de ley que el visor 3D (#3a2620 → #ffa27f entre 2,5 y 11 g/t)
 const colorLey = (ley: number) => {
@@ -16,9 +17,6 @@ const colorLey = (ley: number) => {
   const c = (a: number, b: number) => Math.round(a + (b - a) * k)
   return `rgb(${c(0x3a, 0xff)} ${c(0x26, 0xa2)} ${c(0x20, 0x7f)})`
 }
-
-// hueco libre de ley alta en el bloque 3800-3850, con las medidas del caso de la ficha (30 × 8 × 25)
-const INICIAL: T = { x0: 380, largo: 30, zPiso: 3810, alto: 25, ancho: 8, buzamiento: 90, yCentro: +vetaY(3822.5).toFixed(1) }
 
 // sección longitudinal (x, z) a escala
 const X0 = -15
@@ -31,8 +29,11 @@ const sx = (x: number) => ((x - X0) / (X1 - X0)) * W
 const sz = (z: number) => H - ((z - Z0) / (Z1 - Z0)) * H
 
 export default function Tajeo() {
-  const [t, setT] = useState<T>(INICIAL)
-  const [ev, setEv] = useState({ densidad: 2.9, densidadEsteril: 2.7, leyEsteril: 0.3, sobre: 0.5, pilarMin: 3, leyCorte: 2.5 })
+  const { tajeo, editar } = useDisenos()
+  const editable = useEditable('tajeo')
+  const { t, ev } = tajeo.datos
+  const setT = (t: T) => editar({ ...tajeo.datos, t })
+  const setEv = (e: typeof ev) => editar({ ...tajeo.datos, ev: e })
   const r = evaluarTajeo(t, BLOQUES, ev)
   const avisos = interferenciasTajeo(t, TAJEOS, NIVELES, { pilarMin: ev.pilarMin, altoGaleria: 4, limites: LIMITES })
   const p = (k: keyof T, l: string, u: string, paso = 1) => <Campo key={k} l={l} u={u} paso={paso} v={t[k]} onChange={(v) => setT({ ...t, [k]: v })} invalido={!Number.isFinite(t[k])} />
@@ -62,12 +63,13 @@ export default function Tajeo() {
   return (
     <div className="pb-10">
       <Cabecera titulo="Tajeo paramétrico" detalle="Designer UG · sólido por parámetros evaluado contra el modelo de bloques de la mina piloto" />
-      <div className="px-6 grid grid-cols-12 gap-4 items-start">
+      <BarraDiseno tipo="tajeo" />
+      <fieldset disabled={!editable} className="min-w-0 px-6 grid grid-cols-12 gap-4 items-start [&_input:disabled]:opacity-60">
         <div className="col-span-4 max-[1200px]:col-span-12 space-y-4">
           <Panel
             titulo="Geometría"
             accion={
-              <Boton variante="fant" onClick={() => setT(INICIAL)}>
+              <Boton variante="fant" onClick={() => setT(TAJEO_INICIAL.t)}>
                 Restablecer
               </Boton>
             }
@@ -199,7 +201,7 @@ export default function Tajeo() {
             </div>
           </Panel>
         </div>
-      </div>
+      </fieldset>
     </div>
   )
 }
