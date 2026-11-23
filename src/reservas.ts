@@ -15,8 +15,8 @@ export const ECO_INICIAL: Economia = { precio: 65, recPlanta: 90, costoPlanta: 2
 export const POTENCIA = 5
 // shortcut: la mina piloto no trae categoría de recurso; se supone medido hasta x = 260 m (malla de sondajes cerrada), indicado más allá. Tomarla de Resource UG.
 export const LIMITE_MEDIDO = 260
-const DENSIDAD_ESTERIL = 2.7
-const LEY_ESTERIL = 0.3
+export const DENSIDAD_ESTERIL = 2.7
+export const LEY_ESTERIL = 0.3
 
 interface Parametros {
   metodos: Record<string, Metodo>
@@ -25,7 +25,7 @@ interface Parametros {
   asignacion: Record<string, string>
 }
 
-const TAJEOS_MINA = LABORES.filter((l) => l.tipo === 'Tajeo')
+export const TAJEOS_MINA = LABORES.filter((l) => l.tipo === 'Tajeo')
 const ASIGNACION_INICIAL = Object.fromEntries(TAJEOS_MINA.map((l) => [l.id, l.nivel === 3850 ? 'tl' : 'cyr']))
 
 /** Versión congelada: parámetros y resultado por tajeo. No se edita; para cambiarla se carga y se congela otra. */
@@ -88,7 +88,7 @@ const largo = (eje: V3[]) => eje.slice(1).reduce((s, p, i) => s + Math.hypot(p[0
 const nivelDe = (z: number) => Math.max(NIVELES[NIVELES.length - 1], ...NIVELES.filter((n) => n <= z + 0.001))
 const GALERIAS = LABORES.filter((l) => l.tipo === 'Galería')
 /** Acceso: el piso del tajeo queda a ≤ 10 m sobre una galería de nivel que llega a su tramo. */
-const conAcceso = (t: Tajeo) =>
+export const conAcceso = (t: Tajeo) =>
   GALERIAS.some((g) => {
     const xs = g.eje!.map((p) => p[0])
     return t.zPiso - g.nivel >= 0 && t.zPiso - g.nivel <= 10 && Math.min(...xs) <= t.x0 + t.largo && Math.max(...xs) >= t.x0

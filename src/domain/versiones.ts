@@ -13,6 +13,8 @@ export interface Diseno<D> {
   versiones: Version<D>[]
   /** número de la versión publicada a los otros módulos */
   publicada: number | null
+  /** de dónde vino, si no se dibujó en Designer (p. ej. una forma del optimizador) */
+  origen?: string
 }
 
 export const MSG_CONGELADA = 'Una versión congelada no se edita: crear nueva versión'

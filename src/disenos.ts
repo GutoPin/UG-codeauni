@@ -108,6 +108,7 @@ export function entrega(d: Diseno<Datos>) {
 
 const AUTOR = 'Ingeniero de planeamiento'
 const SENIOR = 'Ingeniero senior de planeamiento'
+const nuevoId = (tipo: Tipo, n: number) => `${tipo === 'labor' ? 'DL' : 'DT'}-${String(n).padStart(2, '0')}-${Math.random().toString(36).slice(2, 6)}`
 const hoy = () => new Date().toISOString().slice(0, 16).replace('T', ' ')
 
 /** Lo que está abierto en el editor: un diseño guardado (id y versión) o uno nuevo sin guardar. */
@@ -130,6 +131,8 @@ interface Estado {
   congelar: (id: string) => void
   publicar: (id: string, numero: number) => string | null
   borrar: (id: string) => void
+  /** crea un diseño de tajeo desde otro módulo sin tocar lo abierto en el editor; devuelve su id */
+  importar: (nombre: string, datos: DatosTajeo, origen: string) => string
 }
 
 export const useDisenos = create<Estado>()(
@@ -152,7 +155,7 @@ export const useDisenos = create<Estado>()(
           const a = abierto(tipo)
           if (!a.id) {
             const n = get().disenos.filter((x) => ultima(x).datos.tipo === tipo).length + 1
-            const id = `${tipo === 'labor' ? 'DL' : 'DT'}-${String(n).padStart(2, '0')}-${Date.now().toString(36).slice(-4)}`
+            const id = nuevoId(tipo, n)
             const d = crear<Datos>(id, nombre?.trim() || `${tipo === 'labor' ? (a.datos as DatosLabor).clase : 'Tajeo'} en diseño ${n}`, a.datos, hoy(), AUTOR)
             set((s) => ({ disenos: [...s.disenos, d], [tipo]: { ...a, id, numero: 1 } }))
             return null
@@ -183,6 +186,11 @@ export const useDisenos = create<Estado>()(
           if (typeof r === 'string') return r
           reemplazar(r)
           return null
+        },
+        importar: (nombre, datos, origen) => {
+          const id = nuevoId('tajeo', get().disenos.filter((x) => ultima(x).datos.tipo === 'tajeo').length + 1)
+          set((s) => ({ disenos: [...s.disenos, { ...crear<Datos>(id, nombre, datos, hoy(), AUTOR), origen }] }))
+          return id
         },
         borrar: (id) =>
           set((s) => ({
