@@ -1,0 +1,100 @@
+@import '@fontsource-variable/archivo/wdth.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Archivo Variable', system-ui, sans-serif;
+  --color-suelo: #111615;
+  --color-panel: #171f1d;
+  --color-panel-2: #1d2624;
+  --color-filete: #29332f;
+  --color-filete-2: #364240;
+  --color-tinta: #e9eeec;
+  --color-tinta-2: #a9b5b1;
+  --color-tinta-3: #84918d;
+  --color-coral: #e8735a;
+  --color-coral-hondo: #d9603f;
+  --color-azul: #3987e5;
+  --color-bien: #2bb52b;
+  --color-alerta: #fab219;
+  --color-critico: #ff5470; /* rojo frío, lejos del coral de acción */
+  --color-aqua: #199e70;
+  --radius-sm: 3px;
+  --radius: 4px;
+}
+
+:root {
+  color-scheme: dark;
+  background: var(--color-suelo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  margin: 0;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-coral) 45%, transparent);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-filete-2) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-coral);
+  outline-offset: 2px;
+}
+
+/* Titulares semicondensados: la voz de los planos y rótulos de mina. */
+.titular {
+  font-stretch: 87.5%;
+  font-weight: 640;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.rotulo {
+  font-stretch: 87.5%;
+  font-weight: 560;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-tinta-3);
+}
+
+input[type='number']::-webkit-inner-spin-button {
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .entra {
+    animation: entra 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+@keyframes entra {
+  from {
+    opacity: 0.001;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+}
+
+.tabla thead th {
+  font-stretch: 87.5%;
+  font-weight: 560;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-tinta-3);
+  text-align: left;
+  white-space: nowrap;
+}
+.tabla thead th.text-right {
+  text-align: right;
+}
