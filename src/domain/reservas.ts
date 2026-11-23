@@ -35,6 +35,7 @@ export function validarMetodo(m: Metodo) {
   for (const [k, n] of [['recuperacion', 'La recuperación'], ['factorPilar', 'El factor de pilar']] as const)
     if (!(m[k] >= 0 && m[k] <= 100)) out.push(`${n} va de 0 a 100 %`)
   if (!(m.sobre >= 0)) out.push('La sobre-rotura no puede ser negativa')
+  if (!(m.costoMina >= 0)) out.push('Falta el costo de mina')
   return out
 }
 
@@ -58,6 +59,8 @@ export const ONZA = 31.1035
 export interface FilaVersion {
   id: string
   nombre: string
+  /** «Mina piloto» o «Designer vN» */
+  origen: string
   metodo: string
   categoria: Categoria
   estado: Estado
@@ -78,6 +81,7 @@ export function compararReservas(antes: FilaVersion[], ahora: FilaVersion[]) {
     if (Math.abs(dt) < 0.5 && Math.abs(dMetal) < 0.5) return []
     const causas = !a ? ['Tajeo nuevo'] : !b ? ['Tajeo retirado'] : []
     if (a && b) {
+      if (a.origen && a.origen !== b.origen) causas.push(`diseño: ${a.origen} → ${b.origen}`)
       if (a.estado !== b.estado) causas.push(`${a.estado} → ${b.estado}`)
       if (a.metodo !== b.metodo) causas.push(`método: ${a.metodo} → ${b.metodo}`)
       if (a.categoria !== b.categoria) causas.push(`categoría: ${a.categoria} → ${b.categoria}`)

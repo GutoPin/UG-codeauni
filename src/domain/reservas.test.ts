@@ -31,20 +31,22 @@ describe('Reserves UG (ficha 03)', () => {
   it('validaciones: ancho mínimo > 0 y porcentajes de 0 a 100', () => {
     expect(validarMetodo(CYR)).toEqual([])
     expect(validarMetodo({ ...CYR, anchoMin: 0, recuperacion: 120 })).toEqual(['Defina el ancho mínimo', 'La recuperación va de 0 a 100 %'])
+    expect(validarMetodo({ ...CYR, costoMina: NaN })).toEqual(['Falta el costo de mina'])
   })
 })
 
 describe('comparación de versiones de reservas', () => {
-  const f = (id: string, o: Partial<FilaVersion> = {}): FilaVersion => ({ id, nombre: id, metodo: 'Corte y relleno', categoria: 'Probada', estado: 'Reserva', t: 1000, metal: 5000, ...o })
+  const f = (id: string, o: Partial<FilaVersion> = {}): FilaVersion => ({ id, nombre: id, origen: 'Mina piloto', metodo: 'Corte y relleno', categoria: 'Probada', estado: 'Reserva', t: 1000, metal: 5000, ...o })
   it('explica cada cambio y omite los tajeos que no cambian', () => {
     const c = compararReservas(
-      [f('A'), f('B'), f('C'), f('D')],
-      [f('A'), f('B', { metodo: 'Taladros largos', t: 1200, metal: 5100 }), f('C', { estado: 'Bajo ley de corte' }), f('E', { t: 300, metal: 900 })],
+      [f('A'), f('B'), f('C'), f('D'), f('F', { origen: 'Designer v1' })],
+      [f('A'), f('B', { metodo: 'Taladros largos', t: 1200, metal: 5100 }), f('C', { estado: 'Bajo ley de corte' }), f('E', { t: 300, metal: 900 }), f('F', { origen: 'Designer v2', t: 800, metal: 4000 })],
     )
     expect(c).toEqual([
       { id: 'B', nombre: 'B', dt: 200, dMetal: 100, causa: 'método: Corte y relleno → Taladros largos' },
       { id: 'C', nombre: 'C', dt: -1000, dMetal: -5000, causa: 'Reserva → Bajo ley de corte' },
       { id: 'D', nombre: 'D', dt: -1000, dMetal: -5000, causa: 'Tajeo retirado' },
+      { id: 'F', nombre: 'F', dt: -200, dMetal: -1000, causa: 'diseño: Designer v1 → Designer v2' },
       { id: 'E', nombre: 'E', dt: 300, dMetal: 900, causa: 'Tajeo nuevo' },
     ])
   })

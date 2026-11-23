@@ -77,7 +77,7 @@ export default function Reservas() {
           ))}
         </div>
 
-        <Versiones actual={r.tajeos.map((x) => ({ id: x.id, nombre: x.nombre, metodo: x.metodo.nombre, categoria: x.categoria, estado: x.estado, t: x.recuperado, metal: x.metal }))} />
+        <Versiones actual={r.tajeos.map((x) => ({ id: x.id, nombre: x.nombre, origen: x.origen, metodo: x.metodo.nombre, categoria: x.categoria, estado: x.estado, t: x.recuperado, metal: x.metal }))} />
 
         <div className="grid grid-cols-12 gap-4 items-start">
           <div className="col-span-4 max-[1200px]:col-span-12 space-y-4">
@@ -92,7 +92,7 @@ export default function Reservas() {
                 <Campo l="Costo de administración" u="US$/t" v={p.eco.costoAdm} onChange={(v) => p.setEco({ costoAdm: v })} />
               </div>
               <p className="px-4 pb-3 text-[12px] text-tinta-3">
-                Ley de corte = costo total / (precio × recuperación de planta). En desarrollo el avance ya paga la mina: su corte es {fmt(r.corteDes, 2)} g/t.
+                Ley de corte = costo total / (precio × recuperación de planta). Desarrollo (supuesto de la demo, ver QUESTIONS 13): el avance ya paga la mina, el material se corta a {fmt(r.corteDes, 2)} g/t.
               </p>
             </Panel>
           </div>

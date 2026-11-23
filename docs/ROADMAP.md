@@ -47,7 +47,8 @@ versiones; edición del eje en planta (arrastrar vértice cambia largo o giro de
 cruces con labores existentes (intersección propuesta, pilar mínimo, atraviesa tajeo) y autocruce; diseños en el visor 3D
 (borrador translúcido); exportación DXF R12 (ejes 3D y contornos cerrados de tajeo) con lectura de ida y vuelta ≤ 1 mm
 probada, strings de Surpac (.str, formato del apéndice de Surpac) y CSV de atributos; plano impreso A3 de la pantalla;
-entrega de la versión publicada a Scheduler UG (actividad y duración) y a Reserves UG (tajeos).
+entrega de la versión publicada: Reserves UG evalúa sus tajeos; para Scheduler UG se calcula la actividad y su duración
+(panel «Entregas» en Proyecto), pero Scheduler UG aún no la consume (llega con H4).
 
 Falta: vértices libres (el eje es una cadena de tramos tangentes: arrastrar solo cambia largo o giro), suavizado,
 intersecciones con geometría propia (hoy solo se señalan), consultas espaciales, servicios, OMF, importar DXF/Surpac a un

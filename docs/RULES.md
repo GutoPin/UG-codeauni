@@ -22,6 +22,8 @@ R4 validada por la operación (ver QUESTIONS.md #2). Todas tienen prueba automá
 | 03 Reserves | Ancho de minado, dilución, diluido, recuperado | `anchoMinado` … `mineralRecuperado` | 1 250 t a 6,4 g/t | R1 |
 | 03 Reserves | Ley de corte = costo / (precio × recuperación) | `leyCorte` | 1,79 g/t | R1 |
 | 03 Reserves | Pilar dejado | `pilar` | 1 566 / 14 094 t | R1 |
+| 03 Reserves | Ley de corte por método; reserva = (diluido − pilar) × recuperación; estado; categoría «la más baja»; comparación de versiones con causa | `leyCorteMetodo`, `reservaTajeo`, `categoriaTajeo`, `compararReservas` | 1,79 g/t; 1 062,5 t y 6 800 g | R0 |
+| 03 Reserves | Ley de corte de desarrollo marginal (planta + adm.) | `leyCorteDesarrollo` | 0,60 g/t | R0 · supuesto, QUESTIONS 13 |
 | 04 Scheduler | Duración; CPM fin-inicio con rechazo de ciclos | `duracion`, `cpm` | 31,4 d; A-C-D 11 d | R1 |
 | 05 Stope | Ley de corte de equilibrio; dilución ELOS | `leyCorteEquilibrio`, `dilucionELOS` | 1,12 g/t; 1 120 t | R1 |
 | 05 Stope | Formas sin traslape por DP; esfuerzo de pilar | `seleccionarFormas`, `esfuerzoPilar` | {1,3} = 22; FS 1,5 | R1 |

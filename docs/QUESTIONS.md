@@ -27,3 +27,6 @@
     sondajes define cada categoría, y la regla «toma la más baja» vale o se prorratea por tonelaje?
 12. **Parámetros por método.** Corte y relleno (3 m, 0,3 m de sobre-rotura, 95 %, 5 % en pilares, 70 US$/t) y taladros
     largos (6 m, 0,6 m, 88 %, 10 %, 45 US$/t) son valores de demostración. ¿Cuáles son los de la mina?
+13. **Ley de corte de desarrollo.** La ficha dice «según su ley contra la ley de corte». La demo usa una ley de corte
+    marginal (solo planta + administración, 0,60 g/t) porque el avance se paga igual; con la ley de corte del método
+    (1,79 g/t) las galerías de 1,2–1,6 g/t irían a desmonte. ¿Qué regla usa la mina?
