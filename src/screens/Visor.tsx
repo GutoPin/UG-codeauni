@@ -40,6 +40,7 @@ export default function Visor() {
   const { filas, niveles } = useCumplimientoLabores()
   const [verBloques, setVerBloques] = useState(true)
   const [verEquipos, setVerEquipos] = useState(true)
+  const [verDisenos, setVerDisenos] = useState(true)
   const [autoRotar, setAutoRotar] = useState(false)
   const [vista, setVista] = useState<{ modo: Vista; n: number }>({ modo: '3d', n: 0 })
   const [resaltado, setResaltado] = useState<string | null>(null)
@@ -62,6 +63,7 @@ export default function Visor() {
         />
         <Interruptor on={verBloques} onChange={setVerBloques}>Bloques de ley</Interruptor>
         <Interruptor on={verEquipos} onChange={setVerEquipos}>Equipos</Interruptor>
+        <Interruptor on={verDisenos} onChange={setVerDisenos}>Diseños</Interruptor>
         <Interruptor on={autoRotar} onChange={setAutoRotar}>Girar</Interruptor>
       </Cabecera>
 
@@ -71,6 +73,7 @@ export default function Visor() {
             niveles={niveles}
             verBloques={verBloques}
             verEquipos={verEquipos}
+            verDisenos={verDisenos}
             autoRotar={autoRotar}
             seleccion={sel}
             resaltado={resaltado}
@@ -118,6 +121,9 @@ export default function Visor() {
               </Pieza>
               <Pieza titulo="Equipos" dibujo={<path d="M17 3 23 10 17 17 11 10Z" fill="#e9eeec" />}>
                 Jumbos y scoops trabajando ahora, en la guardia del jueves día.
+              </Pieza>
+              <Pieza titulo="Diseños" dibujo={<><rect x={4} y={4} width={12} height={12} rx={1} fill="#3987e5" fillOpacity={0.3} stroke="#3987e5" /><rect x={18} y={4} width={12} height={12} rx={1} fill="#3987e5" fillOpacity={0.85} /></>}>
+                Lo guardado en el Designer UG, aún sin excavar: translúcido en borrador, sólido si está congelado.
               </Pieza>
               <li className="pt-2 border-t border-filete">
                 <div className="text-[13px] text-tinta font-medium mb-1">El color es el cumplimiento de la semana</div>

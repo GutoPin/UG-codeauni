@@ -5,6 +5,9 @@ import * as THREE from 'three'
 import { AHORA, GUARDIA_ACTUAL, inicioGuardia, LABORES, LABORES_SEMANA, NIVELES, generarBloques, type Bloque, type Labor, type Tarea } from '../data/minaPiloto'
 import { fmt, laborDe, type Nivel } from '../derive'
 import { useStore } from '../store'
+import { resumen, useDisenos, type Datos } from '../disenos'
+import { areaSeccion, centroTajeo, ejeDeTramos } from '../domain/designer'
+import { estadoDiseno, ultima } from '../domain/versiones'
 import FichaLabor, { modeloEquipo } from './FichaLabor'
 
 const CX = 180
@@ -37,7 +40,7 @@ const posVista = (v: Vista, aspecto: number) => {
   return OBJETIVO.clone().add(VISTAS[v].clone().normalize().multiplyScalar(v === 'planta' ? d * 1.15 : d))
 }
 
-type Foco = { tipo: 'labor'; id: string } | { tipo: 'bloque'; b: Bloque } | { tipo: 'equipo'; t: Tarea } | null
+type Foco = { tipo: 'labor'; id: string } | { tipo: 'bloque'; b: Bloque } | { tipo: 'equipo'; t: Tarea } | { tipo: 'diseno'; nombre: string; estado: string; datos: Datos } | null
 
 const centroLabor = (l: Labor) => {
   if (l.caja) {
@@ -314,6 +317,58 @@ function Tajeo({ l, color, activa, marcada, sel, ...c }: { l: Labor; color: stri
   )
 }
 
+// ─── diseños del Designer UG (última versión de cada uno) ─────────
+// azul: fuera de la paleta de cumplimiento; borrador translúcido, congelado sólido
+const DISENO = '#3987e5'
+
+function geometriaDiseno(d: Datos) {
+  if (d.tipo === 'labor') {
+    const e = ejeDeTramos(d.origen, d.rumbo, d.tramos)
+    const curva = new THREE.CatmullRomCurve3(e.puntos.map(([x, y, z]) => p(x, y, z)))
+    return new THREE.TubeGeometry(curva, Math.max(8, e.puntos.length), Math.sqrt(areaSeccion(d.seccion).conSobre / Math.PI), 8, false)
+  }
+  // paralelepípedo con el buzamiento: cada vértice de un cubo unitario va a su (x, z) y al centro transversal de esa cota
+  const t = d.t
+  const g = new THREE.BoxGeometry(1, 1, 1)
+  const pos = g.attributes.position
+  for (let i = 0; i < pos.count; i++) {
+    const x = t.x0 + (pos.getX(i) + 0.5) * t.largo
+    const z = t.zPiso + (pos.getY(i) + 0.5) * t.alto
+    pos.setXYZ(i, ...p(x, centroTajeo(t, z) + pos.getZ(i) * t.ancho, z).toArray())
+  }
+  g.computeVertexNormals()
+  return g
+}
+
+function Disenos({ onFoco }: { onFoco: Comun['onFoco'] }) {
+  const disenos = useDisenos((s) => s.disenos)
+  const piezas = useMemo(
+    () =>
+      disenos.map((d) => {
+        const v = ultima(d)
+        return { id: d.id, nombre: d.nombre, estado: `v${v.numero} ${estadoDiseno(d) === 'congelado' ? 'congelada' : 'en borrador'}`, congelado: v.congelada, datos: v.datos, geo: geometriaDiseno(v.datos) }
+      }),
+    [disenos],
+  )
+  return piezas.map((k) => {
+    const c = DISENO
+    return (
+      <mesh
+        key={k.id}
+        geometry={k.geo}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          onFoco({ tipo: 'diseno', nombre: k.nombre, estado: k.estado, datos: k.datos })
+        }}
+        onPointerOut={() => onFoco(null)}
+      >
+        <meshStandardMaterial color={c} emissive={c} emissiveIntensity={0.45} transparent opacity={k.congelado ? 0.85 : 0.35} depthWrite={k.congelado} />
+        <Edges color={c} threshold={k.datos.tipo === 'tajeo' ? 1 : 40} />
+      </mesh>
+    )
+  })
+}
+
 /** Equipo trabajando en la guardia actual: un rombo flotando sobre su frente. */
 function Equipo({ t, onFoco }: { t: Tarea; onFoco: Comun['onFoco'] }) {
   const ref = useRef<THREE.Group>(null)
@@ -452,6 +507,23 @@ function Contenido({ f }: { f: NonNullable<Foco> }): ReactNode {
         </dl>
       </div>
     )
+  if (f.tipo === 'diseno') {
+    const r = resumen(f.datos)
+    return (
+      <div className="text-[12.5px] leading-snug">
+        <div className="titular text-[15px]">{f.nombre}</div>
+        <p className="text-tinta-2 mt-1">
+          {f.datos.tipo === 'labor' ? `${f.datos.clase} diseñada` : 'Tajeo diseñado'} en el Designer UG, todavía no excavado · {f.estado}.
+        </p>
+        <dl className="mt-2 pt-2 border-t border-filete grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+          <dt className="text-tinta-3">{f.datos.tipo === 'labor' ? 'Longitud' : 'Largo'}</dt>
+          <dd className="text-right">{fmt(r.largo, 1)} m</dd>
+          <dt className="text-tinta-3">{f.datos.tipo === 'labor' ? 'Roca a extraer' : 'Mineral diluido'}</dt>
+          <dd className="text-right">{fmt(r.t)} t{r.ley != null && ` @ ${fmt(r.ley, 2)} g/t`}</dd>
+        </dl>
+      </div>
+    )
+  }
   const t = f.t
   const u = t.unidad
   return (
@@ -477,6 +549,7 @@ export default function Mina3D({
   verBloques = true,
   verEquipos = true,
   verRotulos = true,
+  verDisenos = true,
   autoRotar = true,
   seleccion,
   resaltado,
@@ -487,6 +560,7 @@ export default function Mina3D({
   verBloques?: boolean
   verEquipos?: boolean
   verRotulos?: boolean
+  verDisenos?: boolean
   autoRotar?: boolean
   seleccion?: string | null
   /** labor resaltada desde fuera (p. ej. al pasar sobre la lista) */
@@ -573,6 +647,7 @@ export default function Mina3D({
               color={marcada === l.id || seleccion === l.id ? TINTA : '#a9b5b1'}
             />
           ))}
+        {verDisenos && <Disenos onFoco={setFoco} />}
         {verEquipos && enTurno.map((t) => <Equipo key={t.equipoId} t={t} onFoco={setFoco} />)}
         <Camara vista={vista} seleccion={seleccion} />
         <OrbitControls makeDefault enableDamping autoRotate={autoRotar && !foco} autoRotateSpeed={0.35} minDistance={60} maxDistance={1400} target={OBJETIVO} />
