@@ -41,3 +41,6 @@
     criterio de FS del cliente? ¿Aplica área tributaria a pilares verticales de una veta?
 17. **Economía del optimizador.** Usa precio, recuperación y costos de Reserves UG, sin costo de venta, y 25 m de acceso
     por forma a 2 500 USD/m. ¿Cuál es el costo de venta, el desarrollo real por tajeo y su costo por metro?
+18. **Valor del plan y pilares de Reserves.** El optimizador valora toneladas diluidas y deja pilares entre tajeos
+    explícitos; Reserves UG, al recibir la forma, descuenta además su factor de pilar y la recuperación del método.
+    ¿Se descuentan los dos, o el factor de pilar de Reserves ya representa los pilares entre tajeos?

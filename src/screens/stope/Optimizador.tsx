@@ -30,6 +30,11 @@ const H = (W * (Z1 - Z0)) / (X1 - X0)
 const sx = (x: number) => ((x - X0) / (X1 - X0)) * W
 const sz = (z: number) => H - ((z - Z0) / (Z1 - Z0)) * H
 
+// la capa de bloques no cambia: se arma una vez y no se repinta al pasar el cursor
+const CAPA_BLOQUES = BLOQUES.filter((b) => b.x >= X0 && b.x <= X1 && b.z >= Z0 && b.z <= Z1).map((b) => (
+  <rect key={`${b.x}|${b.z}`} x={sx(b.x - 2.5)} y={sz(b.z + 2.5)} width={sx(5) - sx(0)} height={sz(0) - sz(5)} fill={colorLey(b.ley)} opacity={0.55} />
+))
+
 export default function Optimizador() {
   const p = useOptimizador()
   const { metodos, eco, asignar } = useReservas()
@@ -245,9 +250,7 @@ function Seccion({ r, p, foco, setFoco }: { r: Corrida; p: ParamOptimizador; foc
       </p>
       <div className="px-4 py-3">
         <svg viewBox={`-62 -6 ${W + 70} ${H + 30}`} className="w-full h-auto block select-none" role="group" aria-label="Formas propuestas sobre el modelo de bloques">
-          {BLOQUES.filter((b) => b.x >= X0 && b.x <= X1 && b.z >= Z0 && b.z <= Z1).map((b) => (
-            <rect key={`${b.x}|${b.z}`} x={sx(b.x - 2.5)} y={sz(b.z + 2.5)} width={sx(5) - sx(0)} height={sz(0) - sz(5)} fill={colorLey(b.ley)} opacity={0.55} />
-          ))}
+          {CAPA_BLOQUES}
           {[...FILAS, 3900].map((n) => (
             <g key={n}>
               <line x1={0} x2={W} y1={sz(n)} y2={sz(n)} stroke="var(--color-tinta-3)" strokeDasharray="3 4" />
@@ -261,9 +264,9 @@ function Seccion({ r, p, foco, setFoco }: { r: Corrida; p: ParamOptimizador; foc
               <rect
                 key={o.id}
                 x={sx(o.x0)}
-                y={sz(fila.nivel + 45)}
+                y={sz(o.z1)}
                 width={sx(o.x1) - sx(o.x0)}
-                height={sz(fila.nivel + 5) - sz(fila.nivel + 45)}
+                height={sz(o.z0) - sz(o.z1)}
                 fill="var(--color-suelo)"
                 fillOpacity={0.7}
                 stroke="var(--color-tinta-3)"
@@ -361,7 +364,8 @@ function Formas({
         <p className="px-4 py-2.5 border-b border-filete text-[12.5px] text-tinta-2 flex gap-2">
           <Icon n="alerta" className="size-4 text-alerta shrink-0" />
           Corrida para comparar: ignora los tajeos ya diseñados, así que sus formas se traslapan con ellos y no se convierten. Disposición actual de la mina
-          con la misma economía: {M(r.actual.valor)} en {fmt(r.actual.t)} t; esta disposición: {M(r.total.valor)} en {fmt(r.total.t)} t.
+          con la misma economía: {M(r.actual.valor)} en {fmt(r.actual.t)} t; esta disposición: {M(r.total.valor)} en {fmt(r.total.t)} t, con{' '}
+          {r.formas.filter((f) => f.pilarBajo).length} de {r.formas.length} formas junto a un pilar bajo el FS exigido.
         </p>
       )}
       {aviso && (
@@ -437,7 +441,8 @@ function Formas({
       </div>
       <p className="px-4 py-2.5 border-t border-filete text-[11.5px] text-tinta-3">
         Ancho de la forma {fmt(r.ancho, 1)} m (veta de 5 m{r.anchoExtra ? `, más ${fmt(r.anchoExtra, 1)} m por el ancho mínimo del método` : ''}). Valor = t × (ley ×
-        R × (P − Cv) − Cp − Cg − Cm) − acceso × costo por metro. La forma convertida es el mismo sólido: Designer UG y Reserves UG la evalúan igual.
+        R × (P − Cv) − Cp − Cg − Cm) − acceso × costo por metro, sobre toneladas diluidas. La forma convertida es el mismo sólido: Designer UG y Reserves UG
+        dan las mismas toneladas y ley diluidas, y Reserves descuenta después su factor de pilar y la recuperación del método.
       </p>
     </Panel>
   )

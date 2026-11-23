@@ -43,6 +43,17 @@ describe('optimizador sobre la mina piloto', () => {
     expect(tl.total.dilucion).toBeGreaterThan(r.total.dilucion)
   })
 
+  it('un tajeo publicado en Designer bloquea su tramo, también si cruza la línea de nivel', () => {
+    const ev = { densidad: 2.9, densidadEsteril: 2.7, leyEsteril: 0.3, sobre: 0.3, pilarMin: 3, leyCorte: 2 }
+    const t = { x0: 380, largo: 40, zPiso: 3840, alto: 30, ancho: 5, buzamiento: 90, yCentro: 0 }
+    const d = [{ id: 'DT-X', nombre: 'Tajeo publicado', publicada: 1, versiones: [{ numero: 1, fecha: '', autor: '', congelada: true, comentario: '', datos: { tipo: 'tajeo' as const, ev, t } }] }]
+    const x = optimizar(PARAM_OPT, METODOS_INICIALES, ECO_INICIAL, d)
+    if (!x.ok) throw new Error(x.errores.join())
+    for (const n of [3800, 3850])
+      for (const f of x.formas.filter((f) => f.nivel === n)) expect(f.inicio >= t.x0 + t.largo + PARAM_OPT.pilarMin || f.fin <= t.x0 - PARAM_OPT.pilarMin).toBe(true)
+    expect(x.formas.some((f) => f.nivel === 3800 && f.fin > 380)).toBe(false)
+  })
+
   it('valida parámetros', () => {
     const e = optimizar({ ...PARAM_OPT, lMin: 70 }, METODOS_INICIALES, ECO_INICIAL, [])
     expect(e.ok).toBe(false)

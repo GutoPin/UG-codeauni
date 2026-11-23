@@ -87,17 +87,22 @@ export function validarOptimizador(p: ParamOptimizador, m: Metodo | undefined, e
 interface Ocupado {
   id: string
   nombre: string
-  nivel: number
   x0: number
   x1: number
+  z0: number
+  z1: number
 }
 /** Tajeos ya diseñados que cuentan en Reserves UG: los de la mina y los publicados en Designer. */
 function ocupados(disenos: Diseno<Datos>[]): Ocupado[] {
   return [
-    ...TAJEOS_MINA.map((l) => ({ id: l.id, nombre: l.nombre, nivel: l.nivel, x0: l.caja![0], x1: l.caja![1] })),
+    ...TAJEOS_MINA.map((l) => ({ id: l.id, nombre: l.nombre, x0: l.caja![0], x1: l.caja![1], z0: l.caja![2], z1: l.caja![3] })),
     ...disenos
       .map(entrega)
-      .flatMap((e) => (e?.datos.tipo === 'tajeo' ? [{ id: e.id, nombre: e.nombre, nivel: Math.floor((e.datos.t.zPiso - 3750) / 50) * 50 + 3750, x0: e.datos.t.x0, x1: e.datos.t.x0 + e.datos.t.largo }] : [])),
+      .flatMap((e) => {
+        if (e?.datos.tipo !== 'tajeo') return []
+        const t = e.datos.t
+        return [{ id: e.id, nombre: e.nombre, x0: t.x0, x1: t.x0 + t.largo, z0: t.zPiso, z1: t.zPiso + t.alto }]
+      }),
   ]
 }
 
@@ -115,7 +120,8 @@ export function optimizar(p: ParamOptimizador, metodos: Record<string, Metodo>, 
 
   const filas = FILAS.map((nivel) => {
     const cols = columnas(nivel, p.alto, ancho, m.sobre)
-    const enFila = existentes.filter((o) => o.nivel === nivel)
+    // un tajeo bloquea toda fila cuya franja de cota toca
+    const enFila = existentes.filter((o) => o.z0 < nivel + 5 + p.alto && o.z1 > nivel + 5)
     const libre = (a: number, b: number) =>
       conAcceso(tajeoDe(nivel, a, b, p.alto, ancho)) && (!p.respetar || !enFila.some((o) => a < o.x1 + p.pilarMin && b > o.x0 - p.pilarMin))
     const cands = candidatas(String(nivel), cols, e, { lMin: p.lMin, lMax: p.lMax, pilarMin: p.pilarMin, corte, costoFijo, leyEsteril: LEY_ESTERIL }, libre)
