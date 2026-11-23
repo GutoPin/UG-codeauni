@@ -4,6 +4,7 @@ import { leyCorteMetodo, ONZA, validarMetodo, type Estado, type Metodo } from '.
 import { useDisenos } from '../../disenos'
 import { evaluarReservas, LIMITE_MEDIDO, POTENCIA, useReservas } from '../../reservas'
 import { Boton, Cabecera, Campo, descargar, Icon, Panel } from '../../ui/kit'
+import Versiones from './Versiones'
 
 const ESTADO: Record<Estado, { i: string; c: string }> = {
   Reserva: { i: 'ok', c: 'text-bien' },
@@ -75,6 +76,8 @@ export default function Reservas() {
             </div>
           ))}
         </div>
+
+        <Versiones actual={r.tajeos.map((x) => ({ id: x.id, nombre: x.nombre, metodo: x.metodo.nombre, categoria: x.categoria, estado: x.estado, t: x.recuperado, metal: x.metal }))} />
 
         <div className="grid grid-cols-12 gap-4 items-start">
           <div className="col-span-4 max-[1200px]:col-span-12 space-y-4">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { categoriaTajeo, leyCorteDesarrollo, leyCorteMetodo, reservaTajeo, validarMetodo, type Metodo } from './reservas'
+import { categoriaTajeo, compararReservas, leyCorteDesarrollo, leyCorteMetodo, reservaTajeo, validarMetodo, type FilaVersion, type Metodo } from './reservas'
 
 const CYR: Metodo = { id: 'cyr', nombre: 'Corte y relleno', anchoMin: 1.2, sobre: 0.3, recuperacion: 85, factorPilar: 0, costoMina: 70 }
 const ECO = { precio: 65, recPlanta: 90, costoPlanta: 25, costoAdm: 10 }
@@ -31,5 +31,21 @@ describe('Reserves UG (ficha 03)', () => {
   it('validaciones: ancho mínimo > 0 y porcentajes de 0 a 100', () => {
     expect(validarMetodo(CYR)).toEqual([])
     expect(validarMetodo({ ...CYR, anchoMin: 0, recuperacion: 120 })).toEqual(['Defina el ancho mínimo', 'La recuperación va de 0 a 100 %'])
+  })
+})
+
+describe('comparación de versiones de reservas', () => {
+  const f = (id: string, o: Partial<FilaVersion> = {}): FilaVersion => ({ id, nombre: id, metodo: 'Corte y relleno', categoria: 'Probada', estado: 'Reserva', t: 1000, metal: 5000, ...o })
+  it('explica cada cambio y omite los tajeos que no cambian', () => {
+    const c = compararReservas(
+      [f('A'), f('B'), f('C'), f('D')],
+      [f('A'), f('B', { metodo: 'Taladros largos', t: 1200, metal: 5100 }), f('C', { estado: 'Bajo ley de corte' }), f('E', { t: 300, metal: 900 })],
+    )
+    expect(c).toEqual([
+      { id: 'B', nombre: 'B', dt: 200, dMetal: 100, causa: 'método: Corte y relleno → Taladros largos' },
+      { id: 'C', nombre: 'C', dt: -1000, dMetal: -5000, causa: 'Reserva → Bajo ley de corte' },
+      { id: 'D', nombre: 'D', dt: -1000, dMetal: -5000, causa: 'Tajeo retirado' },
+      { id: 'E', nombre: 'E', dt: 300, dMetal: 900, causa: 'Tajeo nuevo' },
+    ])
   })
 })

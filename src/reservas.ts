@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { LABORES, NIVELES, type V3 } from './data/minaPiloto'
 import { BLOQUES, entrega, vetaY, type Datos } from './disenos'
 import { evaluarTajeo, type Tajeo } from './domain/designer'
-import { categoriaTajeo, leyCorteDesarrollo, leyCorteMetodo, reservaTajeo, type Categoria, type Economia, type Metodo } from './domain/reservas'
+import { categoriaTajeo, leyCorteDesarrollo, leyCorteMetodo, reservaTajeo, validarMetodo, type Categoria, type Economia, type FilaVersion, type Metodo } from './domain/reservas'
 import type { Diseno } from './domain/versiones'
 
 export const METODOS_INICIALES: Record<string, Metodo> = {
@@ -28,9 +28,38 @@ interface Parametros {
 const TAJEOS_MINA = LABORES.filter((l) => l.tipo === 'Tajeo')
 const ASIGNACION_INICIAL = Object.fromEntries(TAJEOS_MINA.map((l) => [l.id, l.nivel === 3850 ? 'tl' : 'cyr']))
 
-export const useReservas = create<Parametros & { setMetodo: (id: string, m: Partial<Metodo>) => void; setEco: (e: Partial<Economia>) => void; asignar: (tajeo: string, metodo: string) => void; restablecer: () => void }>()(
+/** Versión congelada: parámetros y resultado por tajeo. No se edita; para cambiarla se carga y se congela otra. */
+export interface VersionReservas {
+  numero: number
+  fecha: string
+  autor: string
+  comentario: string
+  parametros: Parametros
+  tajeos: FilaVersion[]
+}
+
+export function validarParametros(p: Parametros) {
+  const out = Object.values(p.metodos).flatMap((m) => validarMetodo(m).map((e) => `${m.nombre}: ${e}`))
+  if (!(p.eco.precio > 0)) out.push('Falta el precio del metal')
+  if (!(p.eco.recPlanta > 0 && p.eco.recPlanta <= 100)) out.push('La recuperación de planta va de 0 a 100 %')
+  if (!(p.eco.costoPlanta >= 0 && p.eco.costoAdm >= 0)) out.push('Faltan los costos de planta y administración')
+  return out
+}
+
+interface Acciones {
+  setMetodo: (id: string, m: Partial<Metodo>) => void
+  setEco: (e: Partial<Economia>) => void
+  asignar: (tajeo: string, metodo: string) => void
+  restablecer: () => void
+  /** congela la evaluación actual; devuelve el error si los parámetros están incompletos */
+  congelar: (comentario: string, tajeos: FilaVersion[]) => string | null
+  cargar: (numero: number) => void
+}
+
+export const useReservas = create<Parametros & { versiones: VersionReservas[] } & Acciones>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      versiones: [],
       metodos: METODOS_INICIALES,
       eco: ECO_INICIAL,
       asignacion: ASIGNACION_INICIAL,
@@ -38,6 +67,18 @@ export const useReservas = create<Parametros & { setMetodo: (id: string, m: Part
       setEco: (e) => set((s) => ({ eco: { ...s.eco, ...e } })),
       asignar: (tajeo, metodo) => set((s) => ({ asignacion: { ...s.asignacion, [tajeo]: metodo } })),
       restablecer: () => set({ metodos: METODOS_INICIALES, eco: ECO_INICIAL, asignacion: ASIGNACION_INICIAL }),
+      congelar: (comentario, tajeos) => {
+        const { metodos, eco, asignacion, versiones } = get()
+        const errores = validarParametros({ metodos, eco, asignacion })
+        if (errores.length) return `No se congela una versión con parámetros incompletos: ${errores.join('; ')}`
+        const numero = versiones.length + 1
+        set({ versiones: [...versiones, { numero, fecha: new Date().toISOString(), autor: 'Gerente de planeamiento', comentario, parametros: { metodos, eco, asignacion }, tajeos }] })
+        return null
+      },
+      cargar: (numero) => {
+        const v = get().versiones.find((x) => x.numero === numero)
+        if (v) set(structuredClone(v.parametros))
+      },
     }),
     { name: 'codea-planning-ug/reservas', version: 1 },
   ),

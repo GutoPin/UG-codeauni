@@ -53,3 +53,36 @@ export type Categoria = 'Probada' | 'Probable'
 export const categoriaTajeo = (cats: Categoria[]): Categoria => (cats.includes('Probable') || !cats.length ? 'Probable' : 'Probada')
 
 export const ONZA = 31.1035
+
+/** Fila de un tajeo tal como queda guardada en una versión de reservas. */
+export interface FilaVersion {
+  id: string
+  nombre: string
+  metodo: string
+  categoria: Categoria
+  estado: Estado
+  /** mineral recuperado (t) y metal (g) */
+  t: number
+  metal: number
+}
+
+/** Cambio de reserva por tajeo entre dos versiones, con su causa (ficha 03: comparación de versiones). */
+export function compararReservas(antes: FilaVersion[], ahora: FilaVersion[]) {
+  const ids = [...new Set([...antes, ...ahora].map((f) => f.id))]
+  const enReserva = (f?: FilaVersion) => (f?.estado === 'Reserva' ? f : { t: 0, metal: 0 })
+  return ids.flatMap((id) => {
+    const a = antes.find((f) => f.id === id)
+    const b = ahora.find((f) => f.id === id)
+    const dt = enReserva(b).t - enReserva(a).t
+    const dMetal = enReserva(b).metal - enReserva(a).metal
+    if (Math.abs(dt) < 0.5 && Math.abs(dMetal) < 0.5) return []
+    const causas = !a ? ['Tajeo nuevo'] : !b ? ['Tajeo retirado'] : []
+    if (a && b) {
+      if (a.estado !== b.estado) causas.push(`${a.estado} → ${b.estado}`)
+      if (a.metodo !== b.metodo) causas.push(`método: ${a.metodo} → ${b.metodo}`)
+      if (a.categoria !== b.categoria) causas.push(`categoría: ${a.categoria} → ${b.categoria}`)
+      if (!causas.length) causas.push('parámetros del método o económicos')
+    }
+    return [{ id, nombre: (b ?? a)!.nombre, dt, dMetal, causa: causas.join(' · ') }]
+  })
+}
