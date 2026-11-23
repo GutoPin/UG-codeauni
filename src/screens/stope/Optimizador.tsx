@@ -7,6 +7,7 @@ import { datosDeForma, FILAS, optimizar, PARAM_OPT, useOptimizador, type Corrida
 import { useReservas } from '../../reservas'
 import { ir } from '../../ruta'
 import { Boton, Cabecera, Campo, descargar, Icon, Panel } from '../../ui/kit'
+import Escenarios from './Escenarios'
 
 // mismos extremos que el visor 3D (colorLey en Mina3D, que no se importa aquí para no cargar three)
 const LEY_MIN = 2.5
@@ -213,6 +214,7 @@ export default function Optimizador() {
             <Seccion r={r} p={params} foco={foco} setFoco={setFoco} />
             <Formas r={r} foco={foco} setFoco={setFoco} convertida={convertida} convertir={convertir} respetar={p.respetar} aviso={aviso} />
             <Pilares r={r} fsMin={p.fsMin} />
+            <Escenarios r={r} params={params} metodos={metodos} eco={eco} disenos={disenos} />
           </div>
         </div>
       </div>

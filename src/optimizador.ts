@@ -241,7 +241,7 @@ export const useOptimizador = create<
         set: (p) => set(p),
         restablecer: () => set(PARAM_OPT),
         congelar: (c) =>
-          set((s) => ({ corridas: [...s.corridas, { ...c, numero: s.corridas.length + 1, fecha: new Date().toISOString(), autor: 'Ingeniero senior', parametros: solo(s) }] })),
+          set((s) => ({ corridas: [...s.corridas, { ...c, numero: s.corridas.length + 1, fecha: new Date().toISOString(), autor: 'Ingeniero senior', parametros: { ...solo(s), corte: c.corte } }] })),
         cargar: (numero) => {
           const c = get().corridas.find((x) => x.numero === numero)
           if (c) set(solo(c.parametros))

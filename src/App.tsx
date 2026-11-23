@@ -15,9 +15,9 @@ import DisenoTajeo from './screens/designer/Tajeo'
 import DisenoProyecto from './screens/designer/Proyecto'
 import Reservas from './screens/reserves/Reservas'
 import ProgramaMina from './screens/scheduler/ProgramaMina'
-import Optimizador from './screens/stope/Optimizador'
 
 const Visor = lazy(() => import('./screens/Visor'))
+const Optimizador = lazy(() => import('./screens/stope/Optimizador'))
 // echarts solo se descarga al abrir Cumplimiento
 const Cumplimiento = lazy(() => import('./screens/stp/Cumplimiento'))
 
@@ -70,7 +70,7 @@ export default function App() {
     if (ruta === '/designer/proyecto') return <DisenoProyecto />
     if (ruta === '/reserves') return <Reservas />
     if (ruta === '/scheduler') return <ProgramaMina />
-    if (ruta === '/stope') return <Optimizador />
+    if (ruta === '/stope') return <Suspense><Optimizador /></Suspense>
     if (ruta === '/mina') return <Suspense><Visor /></Suspense>
     const m = MODULOS.find((x) => `/modulo/${x.id}` === ruta)
     if (m) return <Calculadora key={m.id} modulo={m} />
