@@ -48,7 +48,7 @@ cruces con labores existentes (intersección propuesta, pilar mínimo, atraviesa
 (borrador translúcido); exportación DXF R12 (ejes 3D y contornos cerrados de tajeo) con lectura de ida y vuelta ≤ 1 mm
 probada, strings de Surpac (.str, formato del apéndice de Surpac) y CSV de atributos; plano impreso A3 de la pantalla;
 entrega de la versión publicada: Reserves UG evalúa sus tajeos; para Scheduler UG se calcula la actividad y su duración
-(panel «Entregas» en Proyecto), pero Scheduler UG aún no la consume (llega con H4).
+(panel «Entregas» en Proyecto); Programa de mina (H4) toma el desarrollo publicado como actividad con sus propias tasas.
 
 Falta: vértices libres (el eje es una cadena de tramos tangentes: arrastrar solo cambia largo o giro), suavizado,
 intersecciones con geometría propia (hoy solo se señalan), consultas espaciales, servicios, OMF, importar DXF/Surpac a un
