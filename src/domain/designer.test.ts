@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { areaSeccion, ejeDeTramos, evaluarTajeo, interferenciasTajeo, validarTramos, type Tajeo } from './designer'
+import { areaSeccion, crucesEje, ejeDeTramos, evaluarTajeo, interferenciasTajeo, moverVertice, validarTramos, type Tajeo } from './designer'
 
 describe('Designer UG · constructor de labor', () => {
   it('herradura w 4, h_p 3: 18,28 m²; con 0,2 m de sobre-excavación crece', () => {
@@ -77,5 +77,45 @@ describe('Designer UG · tajeo paramétrico', () => {
       { pilarMin: 3, altoGaleria: 4, limites: [-10, 430, 3735, 3915] },
     )
     expect(msgs).toEqual(['Se traslapa con Tajeo 3825-04', 'Pilar de 2,0 m con la galería del NV 3800; mínimo 3 m'])
+  })
+})
+
+describe('edición del eje y cruces', () => {
+  it('mover vértice: recta toma la proyección, curva el ángulo', () => {
+    expect(moverVertice({ tipo: 'recta', largo: 10, gradiente: 0 }, [0, 0, 0], 0, 25.4, 7)).toMatchObject({ largo: 25 })
+    // curva a la izquierda R10 desde el origen hacia +x: el centro está en (0, 10); el punto (10, 10) es un giro de 90°
+    expect(moverVertice({ tipo: 'curva', radio: 10, giro: 45, gradiente: 0 }, [0, 0, 0], 0, 10, 10)).toMatchObject({ giro: 90 })
+    expect(moverVertice({ tipo: 'curva', radio: 10, giro: -45, gradiente: 0 }, [0, 0, 0], 0, 10, -10)).toMatchObject({ giro: -90 })
+  })
+  const recta = (largo: number, g = 0) => ejeDeTramos([0, 0, 100], 0, [{ tipo: 'recta', largo, gradiente: g }])
+  it('cruce a nivel con una galería: propone intersección', () => {
+    const e = recta(40)
+    const c = crucesEje(e.puntos, e.tramoDe, 2, [{ nombre: 'Galería G', eje: [[20, -30, 100], [20, 30, 100]], r: 2 }], 3)
+    expect(c).toHaveLength(1)
+    expect(c[0].msg).toBe('Cruza Galería G en tramo 1 (cota 100,0): se propone intersección')
+    expect(c[0].grave).toBe(false)
+  })
+  it('pasa sobre una galería con pilar insuficiente', () => {
+    const e = recta(40)
+    // galería 6 m más abajo: hueco = 6 − 2 − 2 = 2 m < 3 m
+    const c = crucesEje(e.puntos, e.tramoDe, 2, [{ nombre: 'Galería G', eje: [[20, -30, 94], [20, 30, 94]], r: 2 }], 3)
+    expect(c[0].msg).toBe('Pilar de 2,0 m con Galería G en tramo 1; mínimo 3 m')
+    expect(crucesEje(e.puntos, e.tramoDe, 2, [{ nombre: 'G', eje: [[20, -30, 90], [20, 30, 90]], r: 2 }], 3)).toHaveLength(0)
+  })
+  it('la rampa en zigzag no se cruza consigo misma; un lazo plano sí', () => {
+    const z = ejeDeTramos([0, 0, 0], 0, [
+      { tipo: 'recta', largo: 40, gradiente: 12 },
+      { tipo: 'curva', radio: 15, giro: 180, gradiente: 12 },
+      { tipo: 'recta', largo: 40, gradiente: 12 },
+      { tipo: 'curva', radio: 15, giro: 180, gradiente: 12 },
+      { tipo: 'recta', largo: 40, gradiente: 12 },
+    ])
+    expect(crucesEje(z.puntos, z.tramoDe, 2.5, [], 3)).toHaveLength(0)
+    const lazo = ejeDeTramos([0, 0, 0], 0, [
+      { tipo: 'recta', largo: 30, gradiente: 0 },
+      { tipo: 'curva', radio: 12, giro: 270, gradiente: 0 },
+      { tipo: 'recta', largo: 40, gradiente: 0 },
+    ])
+    expect(crucesEje(lazo.puntos, lazo.tramoDe, 2.5, [], 3).some((c) => c.msg.startsWith('El eje se cruza consigo mismo entre los tramos 1 y 3'))).toBe(true)
   })
 })

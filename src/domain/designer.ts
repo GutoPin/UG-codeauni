@@ -53,9 +53,13 @@ export interface Reglas {
 /** Barre los tramos desde un origen y rumbo (grados, 0 = +x). Devuelve el eje muestreado cada ~2 m y los totales. */
 export function ejeDeTramos(origen: V3, rumbo: number, tramos: Tramo[]) {
   const puntos: V3[] = [origen]
+  /** tramo (desde 1) al que llega cada punto; el origen es 0 */
+  const tramoDe: number[] = [0]
   let [x, y, z] = origen
   let th = rad(rumbo)
-  const resumen = tramos.map((t) => {
+  const resumen = tramos.map((t, ti) => {
+    const inicio: V3 = [x, y, z]
+    const rumboInicio = th
     const lh = t.tipo === 'recta' ? t.largo : t.radio * rad(Math.abs(t.giro))
     const n = Math.max(1, Math.ceil(lh / 2))
     for (let i = 0; i < n; i++) {
@@ -68,13 +72,14 @@ export function ejeDeTramos(origen: V3, rumbo: number, tramos: Tramo[]) {
       th += dth
       z += (dl * t.gradiente) / 100
       puntos.push([x, y, z])
+      tramoDe.push(ti + 1)
     }
     // gradiente recalculada desde la geometría: Δz / L horizontal × 100
-    return { largo: lh, desnivel: (lh * t.gradiente) / 100, gradiente: lh ? gradiente((lh * t.gradiente) / 100, lh) : 0, zFin: z }
+    return { largo: lh, desnivel: (lh * t.gradiente) / 100, gradiente: lh ? gradiente((lh * t.gradiente) / 100, lh) : 0, zFin: z, inicio, rumboInicio }
   })
   const largoH = resumen.reduce((s, r) => s + r.largo, 0)
   const largo3D = resumen.reduce((s, r) => s + Math.hypot(r.largo, r.desnivel), 0)
-  return { puntos, resumen, largoH, largo3D, desnivel: z - origen[2] }
+  return { puntos, tramoDe, resumen, largoH, largo3D, desnivel: z - origen[2] }
 }
 
 /** Reglas del proyecto, con los mensajes de la ficha 02. */
@@ -87,6 +92,83 @@ export function validarTramos(tramos: Tramo[], reglas: Reglas) {
     if (t.tipo === 'curva' && t.radio < reglas.radioMin) errores.push({ tramo: i + 1, msg: `Radio de giro insuficiente en tramo ${i + 1}` })
   })
   return errores
+}
+
+/**
+ * Mover el vértice final de un tramo hacia el punto (x, y) en planta (ficha 02: edición del eje).
+ * Recta: el largo pasa a la proyección sobre su rumbo. Curva: el giro pasa al ángulo hasta el punto, con el mismo radio y sentido.
+ */
+export function moverVertice(t: Tramo, inicio: V3, rumboInicio: number, x: number, y: number): Tramo {
+  const [sx, sy] = inicio
+  if (t.tipo === 'recta') return { ...t, largo: Math.max(1, Math.round((x - sx) * Math.cos(rumboInicio) + (y - sy) * Math.sin(rumboInicio))) }
+  const sg = Math.sign(t.giro) || 1
+  const cx = sx - sg * t.radio * Math.sin(rumboInicio)
+  const cy = sy + sg * t.radio * Math.cos(rumboInicio)
+  const a = ((sg * (Math.atan2(y - cy, x - cx) - Math.atan2(sy - cy, sx - cx))) * 180) / Math.PI
+  const giro = Math.max(5, Math.round((((a % 360) + 360) % 360) / 5) * 5)
+  return { ...t, giro: sg * giro }
+}
+
+// ── Cruces con otras labores ──────────────────────────────────────
+/** Labor existente vista como obstáculo: eje con radio equivalente, o caja [x0, x1, y0, y1, z0, z1]. */
+export interface Obstaculo {
+  nombre: string
+  eje?: V3[]
+  r?: number
+  caja?: [number, number, number, number, number, number]
+}
+const sub = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
+const dot = (a: V3, b: V3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+function distSegmento(p: V3, a: V3, b: V3) {
+  const ab = sub(b, a)
+  const k = Math.max(0, Math.min(1, dot(sub(p, a), ab) / (dot(ab, ab) || 1)))
+  const d = sub(p, [a[0] + ab[0] * k, a[1] + ab[1] * k, a[2] + ab[2] * k])
+  return Math.sqrt(dot(d, d))
+}
+function distCaja(p: V3, c: NonNullable<Obstaculo['caja']>) {
+  const e = (v: number, lo: number, hi: number) => Math.max(lo - v, 0, v - hi)
+  return Math.hypot(e(p[0], c[0], c[1]), e(p[1], c[2], c[3]), e(p[2], c[4], c[5]))
+}
+const coma = (n: number, d = 1) => n.toFixed(d).replace('.', ',')
+
+/**
+ * Cruces del eje con labores existentes y consigo mismo, medidos en 3D entre el eje muestreado y cada obstáculo.
+ * Hueco = distancia − radios. Hueco < 0: se cruzan y se propone una intersección. 0 ≤ hueco < pilar mínimo: error.
+ */
+export function crucesEje(puntos: V3[], tramoDe: number[], r: number, otros: Obstaculo[], pilarMin: number) {
+  const out: { tramo: number; grave: boolean; msg: string }[] = []
+  for (const o of otros) {
+    // el punto más cercano de cada tramo a este obstáculo
+    const porTramo = new Map<number, { hueco: number; z: number }>()
+    puntos.forEach((p, i) => {
+      const d = o.caja ? distCaja(p, o.caja) : Math.min(...o.eje!.slice(1).map((b, k) => distSegmento(p, o.eje![k], b))) - (o.r ?? 0)
+      const hueco = d - r
+      const t = Math.max(1, tramoDe[i])
+      if (hueco < pilarMin && hueco < (porTramo.get(t)?.hueco ?? Infinity)) porTramo.set(t, { hueco, z: p[2] })
+    })
+    for (const [t, { hueco, z }] of porTramo)
+      out.push(
+        hueco < 0
+          ? { tramo: t, grave: !!o.caja, msg: o.caja ? `Atraviesa ${o.nombre} en tramo ${t}` : `Cruza ${o.nombre} en tramo ${t} (cota ${coma(z)}): se propone intersección` }
+          : { tramo: t, grave: true, msg: `Pilar de ${coma(hueco)} m con ${o.nombre} en tramo ${t}; mínimo ${coma(pilarMin, 0)} m` },
+      )
+  }
+  // consigo mismo: puntos lejanos a lo largo del eje pero cercanos en el espacio
+  const lim = 2 * r + pilarMin
+  const s = [0]
+  for (let i = 1; i < puntos.length; i++) s.push(s[i - 1] + Math.sqrt(dot(sub(puntos[i], puntos[i - 1]), sub(puntos[i], puntos[i - 1]))))
+  // la menor distancia por par de tramos
+  const pares = new Map<string, { d: number; t: number }>()
+  for (let i = 0; i < puntos.length; i++)
+    for (let j = i + 1; j < puntos.length; j++) {
+      if (s[j] - s[i] < 3 * lim) continue
+      const d = Math.sqrt(dot(sub(puntos[i], puntos[j]), sub(puntos[i], puntos[j])))
+      const k = `${Math.max(1, tramoDe[i])} y ${tramoDe[j]}`
+      if (d < lim && d < (pares.get(k)?.d ?? Infinity)) pares.set(k, { d, t: tramoDe[j] })
+    }
+  for (const [k, { d, t }] of pares)
+    out.push({ tramo: t, grave: true, msg: d < 2 * r ? `El eje se cruza consigo mismo entre los tramos ${k}` : `Pilar de ${coma(d - 2 * r)} m entre los tramos ${k}; mínimo ${coma(pilarMin, 0)} m` })
+  return out
 }
 
 // ── Tajeo paramétrico ─────────────────────────────────────────────

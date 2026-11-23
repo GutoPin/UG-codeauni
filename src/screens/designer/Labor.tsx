@@ -1,6 +1,8 @@
-import { useDisenos, type ClaseLabor } from '../../disenos'
+import { useState } from 'react'
+import { LABORES } from '../../data/minaPiloto'
+import { useDisenos, vetaY, type ClaseLabor } from '../../disenos'
 import { fmt } from '../../derive'
-import { areaSeccion, contornoSeccion, ejeDeTramos, validarTramos, type Forma, type Seccion, type Tramo } from '../../domain/designer'
+import { areaSeccion, contornoSeccion, crucesEje, ejeDeTramos, moverVertice, validarTramos, type Forma, type Obstaculo, type Seccion, type Tramo } from '../../domain/designer'
 import { Boton, Cabecera, Campo, Icon, Panel, Segmentos } from '../../ui/kit'
 import BarraDiseno, { useEditable } from './BarraDiseno'
 
@@ -11,6 +13,13 @@ const BIBLIOTECA: { n: string; s: Seccion }[] = [
   { n: 'Rampa 5 × 4,5', s: { forma: 'herradura', ancho: 5, alto: 2, sobre: 0.2 } },
   { n: 'Chimenea 2,4 × 2,4', s: { forma: 'rectangular', ancho: 2.4, alto: 2.4, sobre: 0.1 } },
 ]
+
+// labores existentes de la mina piloto como obstáculos (tajeos: losa de 6 m centrada en la veta, como en el visor 3D)
+const OBSTACULOS: Obstaculo[] = LABORES.map((l) =>
+  l.caja
+    ? { nombre: l.nombre, caja: [l.caja[0], l.caja[1], vetaY((l.caja[2] + l.caja[3]) / 2) - 3, vetaY((l.caja[2] + l.caja[3]) / 2) + 3, l.caja[2], l.caja[3]] }
+    : { nombre: l.nombre, eje: l.eje, r: Math.sqrt(l.seccion) / 2 },
+)
 
 function SeccionSVG({ s }: { s: Seccion }) {
   const dis = contornoSeccion(s.forma, s.ancho, s.alto)
@@ -44,30 +53,39 @@ export default function Labor() {
   const area = areaSeccion(seccion)
   const eje = ejeDeTramos(dl.origen, rumbo, tramos)
   const errores = validarTramos(tramos, reglas)
-  const malos = new Set(errores.map((e) => e.tramo))
+  const cruces = crucesEje(eje.puntos, eje.tramoDe, Math.sqrt(area.conSobre / Math.PI), OBSTACULOS, dl.pilarMin)
+  const malos = new Set([...errores.map((e) => e.tramo), ...cruces.filter((c) => c.grave).map((c) => c.tramo)])
+  const [arrastre, setArrastre] = useState<{ i: number; vista: { x0: number; y0: number; kp: number; altoP: number } } | null>(null)
   const cambiar = (i: number, t: Partial<Tramo>) => setTramos(tramos.map((x, j) => (j === i ? ({ ...x, ...t } as Tramo) : x)))
+  const mover = (i: number, d: -1 | 1) => {
+    const n = [...tramos]
+    ;[n[i], n[i + d]] = [n[i + d], n[i]]
+    setTramos(n)
+  }
 
   // vista en planta y perfil longitudinal del eje
   const xs = eje.puntos.map((p) => p[0])
   const ys = eje.puntos.map((p) => p[1])
   const [x0, x1, y0, y1] = [Math.min(...xs) - 8, Math.max(...xs) + 8, Math.min(...ys) - 8, Math.max(...ys) + 8]
-  const kp = Math.min(300 / (x1 - x0), 220 / (y1 - y0))
-  const altoP = (y1 - y0) * kp + 20
+  // mientras se arrastra un vértice la escala queda fija, así el punto sigue al puntero
+  const { x0: px0, y0: py0, kp, altoP } = arrastre?.vista ?? { x0, y0, kp: Math.min(300 / (x1 - x0), 220 / (y1 - y0)), altoP: (y1 - y0) * Math.min(300 / (x1 - x0), 220 / (y1 - y0)) + 20 }
+  const aPlanta = (x: number, y: number) => `${((x - px0) * kp).toFixed(1)},${((y - py0) * kp).toFixed(1)}`
+  const aMundo = (e: React.PointerEvent<SVGSVGElement>) => {
+    const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(e.currentTarget.getScreenCTM()!.inverse())
+    return [(q.x - 10) / kp + px0, (altoP - 10 - q.y) / kp + py0] as const
+  }
+  const finTramo = tramos.map((_, i) => eje.tramoDe.lastIndexOf(i + 1))
   let acum = 0
   const perfil = eje.puntos.map((p, i) => {
     if (i) acum += Math.hypot(p[0] - eje.puntos[i - 1][0], p[1] - eje.puntos[i - 1][1])
     return [acum, p[2]] as const
   })
-  const zMin = cota
+  const zMin = Math.min(cota, ...eje.puntos.map((p) => p[2]))
   const zMax = Math.max(cota + 1, ...eje.puntos.map((p) => p[2]))
   const sxP = (d: number) => (d / Math.max(1, acum)) * 380
   const szP = (z: number) => 150 - ((z - zMin) / (zMax - zMin)) * 130
   // tramo de cada punto del eje, para pintar en rojo los que violan una regla
-  const tramoDe: number[] = [0]
-  tramos.forEach((t, i) => {
-    const lh = t.tipo === 'recta' ? t.largo : (t.radio * Math.PI * Math.abs(t.giro)) / 180
-    for (let k = 0; k < Math.max(1, Math.ceil(lh / 2)); k++) tramoDe.push(i + 1)
-  })
+  const tramoDe = eje.tramoDe
   const trazos = (f: (p: (typeof eje.puntos)[number], i: number) => string) =>
     tramos.map((_, t) => {
       const idx = eje.puntos.map((_, i) => i).filter((i) => tramoDe[i] === t + 1 || tramoDe[i + 1] === t + 1)
@@ -181,7 +199,7 @@ export default function Labor() {
                   <th className="px-2 py-2 font-semibold text-right">Largo horiz.</th>
                   <th className="px-2 py-2 font-semibold text-right">Desnivel</th>
                   <th className="px-2 py-2 font-semibold text-right">Cota final</th>
-                  <th className="px-4 py-2 font-semibold w-10" />
+                  <th className="px-3 py-2 font-semibold w-[120px]" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-filete">
@@ -206,27 +224,40 @@ export default function Labor() {
                       <td className="px-2 py-2 text-right">{fmt(r.largo, 1)} m</td>
                       <td className="px-2 py-2 text-right">{fmt(r.desnivel, 2)} m</td>
                       <td className="px-2 py-2 text-right">{fmt(r.zFin, 1)}</td>
-                      <td className="px-4 py-2">
-                        <button aria-label={`Quitar tramo ${i + 1}`} onClick={() => setTramos(tramos.filter((_, j) => j !== i))} className="text-tinta-3 hover:text-critico cursor-pointer">
-                          <Icon n="x" className="size-4" />
-                        </button>
+                      <td className="px-3 py-2">
+                        <div className="flex gap-0.5 text-tinta-3">
+                          {(
+                            [
+                              ['arriba', `Subir tramo ${i + 1}`, () => mover(i, -1), i === 0],
+                              ['abajo', `Bajar tramo ${i + 1}`, () => mover(i, 1), i === tramos.length - 1],
+                              ['mas', `Insertar recta después del tramo ${i + 1}`, () => setTramos([...tramos.slice(0, i + 1), { tipo: 'recta', largo: 20, gradiente: t.gradiente }, ...tramos.slice(i + 1)]), false],
+                            ] as const
+                          ).map(([n, l, f, off]) => (
+                            <button key={n} aria-label={l} title={l} disabled={off} onClick={f} className="p-1 rounded hover:text-tinta hover:bg-panel-2 cursor-pointer disabled:opacity-30 disabled:pointer-events-none">
+                              <Icon n={n} className="size-3.5" />
+                            </button>
+                          ))}
+                          <button aria-label={`Quitar tramo ${i + 1}`} title={`Quitar tramo ${i + 1}`} onClick={() => setTramos(tramos.filter((_, j) => j !== i))} className="p-1 rounded hover:text-critico hover:bg-panel-2 cursor-pointer">
+                            <Icon n="x" className="size-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
-            {errores.length > 0 ? (
-              <ul role="alert" className="px-4 py-2.5 border-t border-filete space-y-1 text-[13px] text-critico">
-                {errores.map((e) => (
-                  <li key={e.msg} className="flex items-center gap-2">
-                    <Icon n="x" className="size-4" /> {e.msg}
+            {errores.length + cruces.length > 0 ? (
+              <ul role="alert" className="px-4 py-2.5 border-t border-filete space-y-1 text-[13px]">
+                {[...errores.map((e) => ({ msg: e.msg, grave: true })), ...cruces].map((e) => (
+                  <li key={e.msg} className={`flex items-center gap-2 ${e.grave ? 'text-critico' : 'text-alerta'}`}>
+                    <Icon n={e.grave ? 'x' : 'alerta'} className="size-4 shrink-0" /> {e.msg}
                   </li>
                 ))}
               </ul>
             ) : (
               <p role="status" className="px-4 py-2.5 border-t border-filete text-[13px] text-tinta-2 flex items-center gap-2">
-                <Icon n="ok" className="size-4 text-bien" /> El eje cumple las reglas del proyecto.
+                <Icon n="ok" className="size-4 text-bien" /> El eje cumple las reglas del proyecto y no cruza otras labores.
               </p>
             )}
           </Panel>
@@ -248,18 +279,61 @@ export default function Labor() {
 
           <div className="grid grid-cols-2 max-[900px]:grid-cols-1 gap-4">
             <Panel titulo="Planta">
-              <svg viewBox={`0 0 320 ${altoP}`} className="w-full block" role="img" aria-label="Eje de la labor en planta">
+              <svg
+                viewBox={`0 0 320 ${altoP}`}
+                className={`w-full block touch-none ${arrastre ? 'cursor-grabbing' : ''}`}
+                role="img"
+                aria-label="Eje de la labor en planta, con las labores existentes en gris"
+                onPointerMove={(e) => {
+                  if (!arrastre) return
+                  const [x, y] = aMundo(e)
+                  const r = eje.resumen[arrastre.i]
+                  setTramos(tramos.map((t, j) => (j === arrastre.i ? moverVertice(t, r.inicio, r.rumboInicio, x, y) : t)))
+                }}
+                onPointerUp={() => setArrastre(null)}
+                onLostPointerCapture={() => setArrastre(null)}
+              >
                 <g transform={`translate(10 ${altoP - 10}) scale(1 -1)`}>
-                  {trazos((p) => `${((p[0] - x0) * kp).toFixed(1)},${((p[1] - y0) * kp).toFixed(1)}`).map((s) => (
+                  {OBSTACULOS.filter((o) => {
+                    // en planta solo las labores a menos de 15 m de cota del diseño
+                    const zs = o.caja ? [o.caja[4], o.caja[5]] : o.eje!.map((p) => p[2])
+                    return Math.min(...zs) < zMax + 15 && Math.max(...zs) > zMin - 15
+                  }).map((o) =>
+                    o.caja ? (
+                      <rect key={o.nombre} x={(o.caja[0] - px0) * kp} y={(o.caja[2] - py0) * kp} width={(o.caja[1] - o.caja[0]) * kp} height={(o.caja[3] - o.caja[2]) * kp} fill="var(--color-tinta-3)" fillOpacity={0.12} stroke="var(--color-tinta-3)" strokeOpacity={0.4} />
+                    ) : (
+                      <path key={o.nombre} d={o.eje!.map((p, i) => `${i ? 'L' : 'M'}${aPlanta(p[0], p[1])}`).join('')} fill="none" stroke="var(--color-tinta-3)" strokeOpacity={0.45} strokeWidth={Math.max(1.5, 2 * o.r! * kp)} />
+                    ),
+                  )}
+                  {trazos((p) => aPlanta(p[0], p[1])).map((s) => (
                     <path key={s.t} d={s.d} fill="none" stroke={malos.has(s.t) ? 'var(--color-critico)' : 'var(--color-azul)'} strokeWidth={Math.max(2, seccion.ancho * kp)} strokeOpacity={0.35} strokeLinejoin="round" />
                   ))}
-                  {trazos((p) => `${((p[0] - x0) * kp).toFixed(1)},${((p[1] - y0) * kp).toFixed(1)}`).map((s) => (
+                  {trazos((p) => aPlanta(p[0], p[1])).map((s) => (
                     <path key={s.t} d={s.d} fill="none" stroke={malos.has(s.t) ? 'var(--color-critico)' : 'var(--color-tinta)'} strokeWidth={1.2} />
                   ))}
-                  <circle cx={(ox - x0) * kp} cy={(oy - y0) * kp} r={4} fill="var(--color-coral)" />
+                  <circle cx={(ox - px0) * kp} cy={(oy - py0) * kp} r={4} fill="var(--color-coral)" />
+                  {editable &&
+                    finTramo.map((k, i) => (
+                      <circle
+                        key={i}
+                        cx={(eje.puntos[k][0] - px0) * kp}
+                        cy={(eje.puntos[k][1] - py0) * kp}
+                        r={5}
+                        fill="var(--color-panel)"
+                        stroke={arrastre?.i === i ? 'var(--color-coral)' : 'var(--color-tinta)'}
+                        strokeWidth={1.5}
+                        className="cursor-grab"
+                        onPointerDown={(e) => {
+                          e.currentTarget.ownerSVGElement!.setPointerCapture(e.pointerId)
+                          setArrastre({ i, vista: { x0: px0, y0: py0, kp, altoP } })
+                        }}
+                      >
+                        <title>{`Arrastrar el final del tramo ${i + 1}`}</title>
+                      </circle>
+                    ))}
                 </g>
               </svg>
-              <p className="px-4 pb-3 text-[11.5px] text-tinta-3">Punto coral = inicio. Ancho dibujado a escala de la sección.</p>
+              <p className="px-4 pb-3 text-[11.5px] text-tinta-3">Punto coral = inicio. Arrastra los círculos para mover el final de cada tramo: la recta cambia su largo y la curva su giro. En gris, las labores existentes.</p>
             </Panel>
             <Panel titulo="Perfil longitudinal">
               <svg viewBox="-40 0 430 175" className="w-full block" role="img" aria-label="Perfil de cota a lo largo del eje">

@@ -25,6 +25,8 @@ const PATHS: Record<string, string> = {
   flecha: 'M4 10h12m-4-4 4 4-4 4',
   intercambio: 'M4 7h12l-3.5-3.5M16 13H4l3.5 3.5',
   mas: 'M10 4v12M4 10h12',
+  arriba: 'M10 16V4M5.5 8.5 10 4l4.5 4.5',
+  abajo: 'M10 4v12m-4.5-4.5L10 16l4.5-4.5',
   candado: 'M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v8h-11z',
   proyecto: 'M3 5.5h5l1.5 2H17v9H3zM3 9.5h14',
   menos: 'M4 10h12',
