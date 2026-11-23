@@ -77,6 +77,19 @@ describe('Blend UG: casos de la ficha resueltos con el solver', () => {
     expect(r.periodos.every((q) => q.t <= 100 + 1e-6)).toBe(true)
   })
 
+  it('chimenea con 800 t de capacidad, 700 t dentro y 300 t que llegan, sin extracción: entran 100 t', () => {
+    const f = [
+      fuente('carga', 2, [700], { ruta: 'chimenea', enChimenea: true, nivel: 3800 }),
+      fuente('A', 9, [300], { ruta: 'chimenea', nivel: 3850 }),
+    ]
+    const m = armarModelo(base(f, { transporte: { ...base(f).transporte, chimeneaSalida: 0 } }))
+    // mismo modelo, pero el objetivo es meter todo lo posible de A en la chimenea
+    const lp = m.lp.replace(/^Maximize\n obj: .*$/m, `Maximize\n obj: + 1 ${m.x.A[0]}`)
+    const s = solve(lp)
+    expect(s.Status).toBe('Optimal')
+    expect(s.Columns[m.x.A[0]].Primal).toBeCloseTo(100)
+  })
+
   it('una fuente agotada (0 t disponibles) sale del plan', () => {
     const r = ok(resolverMezcla(base([fuente('A', 9, [0, 0]), fuente('B', 5, [300, 300])]), solve))
     expect(r.porFuente.find((x) => x.f.id === 'A')!.planta).toBe(0)

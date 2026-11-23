@@ -109,7 +109,7 @@ export function armarProblema(tareas: Tarea[], habilitacion: Record<string, Habi
       nombre: l.nombre,
       tipo: l.tipo === 'Tajeo' ? 'Tajeo' : 'Frente',
       nivel: l.nivel,
-      // de los niveles superiores el mineral baja por la chimenea de traspaso al NV 3750; allí lo cargan los camiones al pique
+      // de los niveles superiores el mineral baja por la chimenea de traspaso directo al echadero del pique; el NV 3750 lo lleva en camión
       ruta: l.nivel > 3750 ? 'chimenea' : 'camion',
       ley: l.ley,
       ...CALIDAD[id],

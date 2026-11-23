@@ -120,4 +120,5 @@ tolvas y límite por hora, orden FIFO dentro de la chimenea (hoy el solver elige
 tajeos de contaminante alto en la misma guardia» (necesita variables enteras, sin duales), destinos acopio y relleno,
 cadena mina a mercado y penalidades de contrato, re-optimización por guardia con lo extraído, comparación real contra
 plan de ley, cola sin señal en tablet, entrega al STP y a Scheduler (hoy el plan aprobado no lo consume ningún módulo) y
-exportación con el formato real de Metso DPM. Ver QUESTIONS.md 19–20.
+exportación con el formato real de Metso DPM. El mineral puede pasar por la chimenea en la misma guardia, así que su
+capacidad casi nunca limita con estos datos; «Reiniciar demo» no borra la mezcla. Ver QUESTIONS.md 19–20.

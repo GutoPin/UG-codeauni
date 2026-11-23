@@ -165,7 +165,8 @@ export default function Mezcla() {
             <div role="alert" className="flex items-start gap-3 text-[13px] bg-panel border border-critico/50 rounded px-4 py-3">
               <Icon n="alerta" className="size-4 text-critico mt-0.5 shrink-0" />
               <span>
-                No hay mezcla que cumpla todos los límites. Este es el plan que menos los rompe; se rompen{' '}
+                No hay mezcla que cumpla todos los límites. Este plan minimiza la suma de excesos (toneladas y toneladas × unidad de calidad, sin pesos por
+                límite), así que suele ceder primero la calidad. Se rompen{' '}
                 {[...new Set(r.violadas.map((v) => ETIQUETA[v.tipo]!.toLowerCase()))].join(', ')} en {new Set(r.violadas.map((v) => v.periodo)).size} guardias. Sin
                 costos sombra: solo valen con todos los límites cumplidos.
               </span>
@@ -200,7 +201,7 @@ function Alertas({ r, p }: { r: ResultadoMezcla; p: ParamMezcla }) {
   const prox = Object.entries(r.periodos[0]?.aportes ?? {}).sort((a, b) => b[1] - a[1])
   return (
     <div className="grid grid-cols-2 max-[1100px]:grid-cols-1 gap-4 items-start">
-      <Panel titulo={`Plan de la próxima guardia · ${nombreGuardia(ABIERTAS[0].fecha, ABIERTAS[0].g)}`}>
+      <Panel titulo={`${ABIERTAS[0].estado === 'actual' ? 'Guardia en curso' : 'Próxima guardia'} · ${nombreGuardia(ABIERTAS[0].fecha, ABIERTAS[0].g)}`}>
         <ol className="p-4 space-y-1 text-[13px]">
           {prox.map(([id, t], i) => {
             const f = r.porFuente.find((x) => x.f.id === id)!.f
@@ -219,19 +220,19 @@ function Alertas({ r, p }: { r: ResultadoMezcla; p: ParamMezcla }) {
       </Panel>
       <Panel titulo="Alertas">
         <ul className="p-4 space-y-1.5 text-[13px]">
-          {agotan.map((x) => (
-            <li key={x.f.id} className="flex items-start gap-2">
-              <Icon n="alerta" className="size-4 text-alerta mt-0.5 shrink-0" /> {x.f.nombre} se agota en la semana: el plan usa todo lo que el STP vuela.
+          {agotan.length > 0 && (
+            <li className="text-tinta-2">
+              El plan saca todo lo que el STP vuela en {agotan.map((x) => x.f.nombre).join(', ')}: más mineral listo ahí subiría el valor (ver costos sombra).
             </li>
-          ))}
+          )}
           {llena.length > 0 && (
             <li className="flex items-start gap-2">
               <Icon n="alerta" className="size-4 text-alerta mt-0.5 shrink-0" /> La chimenea de traspaso llega al 95 % de su capacidad en {llena.length} guardias.
             </li>
           )}
-          {!agotan.length && !llena.length && (
+          {!llena.length && (
             <li className="flex items-center gap-2 text-tinta-2">
-              <Icon n="ok" className="size-4 text-bien" /> Ninguna fuente se agota y la chimenea no llega a su límite.
+              <Icon n="ok" className="size-4 text-bien" /> La chimenea de traspaso no llega a su límite en ninguna guardia.
             </li>
           )}
         </ul>
@@ -245,7 +246,9 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
     ...cerradas.map((q) => ({ nombre: nombreGuardia(q.fecha, q.g), cerrada: true, reportado: q.reportado, t: q.t, ley: q.ley, dureza: null as number | null, as: null as number | null, chimenea: null as number | null, i: -1 })),
     ...r.periodos.map((q, i) => ({ nombre: nombreGuardia(ABIERTAS[i].fecha, ABIERTAS[i].g), cerrada: false, reportado: true, t: q.t, ley: q.ley, dureza: q.dureza, as: q.as, chimenea: q.chimenea, i })),
   ]
-  const x = filas.map((f) => f.nombre)
+  // las cerradas son mineral volado, no alimentación a planta: van en la tabla, no en los gráficos
+  const abiertas = filas.filter((f) => !f.cerrada)
+  const x = abiertas.map((f) => f.nombre)
   const tOp = useMemo(
     () => ({
       ...BASE,
@@ -258,7 +261,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
           type: 'bar',
           name: 'A planta',
           barMaxWidth: 22,
-          data: filas.map((f) => ({ value: f.reportado ? f.t : null, itemStyle: { color: f.cerrada ? '#4b5a56' : '#199e70', borderRadius: [4, 4, 0, 0] } })),
+          data: abiertas.map((f) => ({ value: f.t, itemStyle: { color: '#199e70', borderRadius: [4, 4, 0, 0] } })),
           markLine: {
             symbol: 'none',
             silent: true,
@@ -271,7 +274,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
         },
       ],
     }),
-    [filas, x, p],
+    [abiertas, x, p],
   )
   const leyOp = useMemo(
     () => ({
@@ -284,7 +287,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
         {
           type: 'line',
           name: 'Ley',
-          data: filas.map((f) => (f.reportado && f.t > 0 ? +f.ley.toFixed(2) : null)),
+          data: abiertas.map((f) => (f.t > 0 ? +f.ley.toFixed(2) : null)),
           lineStyle: { width: 2, color: '#e9eeec' },
           itemStyle: { color: '#e9eeec' },
           symbolSize: 8,
@@ -301,7 +304,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
         },
       ],
     }),
-    [filas, x, p],
+    [abiertas, x, p],
   )
   const refT = useEcharts(tOp)
   const refL = useEcharts(leyOp)
@@ -310,7 +313,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
     <Panel titulo="Plan de alimentación por guardia">
       <div className="grid grid-cols-2 max-[1100px]:grid-cols-1 gap-4 px-4 pt-3">
         <div>
-          <div className="text-[12.5px] text-tinta-2 mb-1">Toneladas a planta · línea gris: planta · línea coral: pique · barras grises: guardias cerradas (mineral volado según el real del STP)</div>
+          <div className="text-[12.5px] text-tinta-2 mb-1">Toneladas a planta por guardia abierta · línea gris: planta · línea coral: pique</div>
           <div ref={refT} className="h-[220px]" role="img" aria-label="Toneladas a planta por guardia frente a la capacidad de planta y del pique" />
         </div>
         <div>
@@ -346,7 +349,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
                   <td className="px-2 py-1.5 text-right">{f.chimenea == null ? '—' : fmt(f.chimenea)}</td>
                   <td className="px-2 py-1.5">
                     {f.cerrada ? (
-                      f.reportado ? 'Cerrada · real' : 'Cerrada · sin reporte'
+                      f.reportado ? 'Cerrada · volado real' : 'Cerrada · sin reporte'
                     ) : viola && viola.length ? (
                       <span className="inline-flex items-center gap-1.5 text-critico">
                         <Icon n="x" className="size-3.5" /> Rompe {viola.map((v) => ETIQUETA[v.tipo]!.toLowerCase()).join(', ')}
@@ -363,7 +366,7 @@ function PlanGuardias({ r, p, cerradas }: { r: ResultadoMezcla; p: ParamMezcla; 
           </tbody>
         </table>
         <p className="mt-2 text-[12px] text-tinta-3">
-          Las guardias cerradas no se editan: muestran el mineral volado que el STP reporta como real en tajeos y frentes con ley; lo izado por el pique y la dureza y el arsénico medidos no se registran en la demo.
+          Las guardias cerradas no se editan ni entran al solver: muestran el mineral volado que el STP reporta como real en tajeos y frentes con ley; lo izado por el pique y la dureza y el arsénico medidos no se registran en la demo.
         </p>
       </div>
     </Panel>
