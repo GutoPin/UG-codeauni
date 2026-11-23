@@ -87,3 +87,37 @@ export function porPeriodo(acts: Aporte[], periodos: { nombre: string; desde: nu
     return { ...x, ley: x.t ? x.finos / x.t : 0 }
   })
 }
+
+/** Actividad tal como queda en un escenario aprobado. */
+export interface FilaEscenario {
+  id: string
+  nombre: string
+  /** objeto enlazado con su versión de diseño, p. ej. «DL-01@v2» */
+  enlace: string
+  cantidad: number
+  unidad: string
+  dias: number
+  inicio: number
+  fin: number
+}
+
+/**
+ * Actividades que cambian entre un escenario y otro. Las de diseño o cantidad distinta quedan marcadas para recalcular
+ * (ficha 04: si el diseño enlazado cambia, el sistema marca las actividades afectadas).
+ */
+export function compararEscenarios(base: FilaEscenario[], actual: FilaEscenario[]) {
+  const ids = [...new Set([...base, ...actual].map((f) => f.id))]
+  return ids.flatMap((id) => {
+    const a = base.find((f) => f.id === id)
+    const b = actual.find((f) => f.id === id)
+    if (!a || !b) return [{ id, nombre: (b ?? a)!.nombre, marcada: true, causa: !a ? 'Actividad nueva' : 'Actividad retirada', dias: [a?.dias ?? 0, b?.dias ?? 0], corrimiento: 0 }]
+    const causas: string[] = []
+    if (a.enlace !== b.enlace) causas.push(`diseño: ${a.enlace.split('@')[1] ?? a.enlace} → ${b.enlace.split('@')[1] ?? b.enlace}`)
+    const n = (x: number) => String(+x.toFixed(1)).replace('.', ',')
+    if (Math.abs(a.cantidad - b.cantidad) > 0.05) causas.push(`cantidad: ${n(a.cantidad)} → ${n(b.cantidad)} ${b.unidad}`)
+    const marcada = causas.length > 0
+    if (a.dias !== b.dias && !marcada) causas.push('tasas o disponibilidad')
+    if (!causas.length && a.inicio !== b.inicio) causas.push('se corre por otras actividades o recursos')
+    return causas.length ? [{ id, nombre: b.nombre, marcada, causa: causas.join(' · '), dias: [a.dias, b.dias], corrimiento: b.inicio - a.inicio }] : []
+  })
+}

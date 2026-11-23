@@ -10,7 +10,10 @@ const totales = (fs: FilaVersion[]) => {
   const metal = r.reduce((s, f) => s + f.metal, 0)
   return { t, metal, ley: t ? metal / t : 0 }
 }
-const signo = (x: number, d = 0) => `${x > 0 ? '+' : x < 0 ? '−' : ''}${fmt(Math.abs(x), d)}`
+const signo = (v: number, d = 0) => {
+  const x = +v.toFixed(d)
+  return `${x > 0 ? '+' : x < 0 ? '−' : ''}${fmt(Math.abs(x), d)}`
+}
 const FECHA = new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 /** Versiones congeladas de reservas y su comparación con la evaluación actual (ficha 03). */

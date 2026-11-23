@@ -28,3 +28,22 @@ describe('programa de mina desde Reserves UG', () => {
     expect(e.errores[0]).toMatch(/Scoop.*no tiene unidades/)
   })
 })
+
+describe('escenarios y cambio de diseño', () => {
+  it('una galería que se alarga 20 m: su duración sube y queda marcada', async () => {
+    const { LABOR_INICIAL } = await import('./disenos')
+    const { compararEscenarios } = await import('./domain/scheduler')
+    const v = (n: number, extra: number) => ({
+      numero: n, fecha: '', autor: '', congelada: true, comentario: '',
+      datos: { ...LABOR_INICIAL, clase: 'Galería' as const, tramos: [{ tipo: 'recta' as const, largo: 100 + extra, gradiente: 1 }] },
+    })
+    const d = (publicada: number) => [{ id: 'DL-09', nombre: 'Galería 3750 E', versiones: [v(1, 0), v(2, 20)], publicada }]
+    const a = calcularPrograma(PARAM_INICIAL, reservas, d(1))
+    const b = calcularPrograma(PARAM_INICIAL, reservas, d(2))
+    if (!a.ok || !b.ok) throw new Error('sin programa')
+    const c = compararEscenarios(a.filas, b.filas).find((x) => x.id === 'DES-DL-09')!
+    expect(c.marcada).toBe(true)
+    expect(c.causa).toMatch(/^diseño: v1 → v2 · cantidad: 100 → 120 m$/)
+    expect(c.dias[1]).toBeGreaterThan(c.dias[0])
+  })
+})

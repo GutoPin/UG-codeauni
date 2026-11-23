@@ -6,6 +6,7 @@ import { useDisenos } from '../../disenos'
 import { calcularPrograma, esParada, FERIADOS, fechaDe, isoDe, usePrograma, type ActividadMina, type TipoActividad } from '../../programa'
 import { evaluarReservas, useReservas } from '../../reservas'
 import { Boton, Cabecera, Campo, descargar, Icon, Panel, Segmentos } from '../../ui/kit'
+import Escenarios from './Escenarios'
 
 const COLOR: Record<TipoActividad, string> = { Desarrollo: '#3987e5', Preparación: '#3987e5', Producción: '#199e70', Relleno: '#84918d' }
 const MES = new Intl.DateTimeFormat('es-PE', { month: 'short', year: '2-digit', timeZone: 'UTC' })
@@ -73,7 +74,7 @@ export default function ProgramaMina() {
       </div>
     )
 
-  const { acts, niv, fin, meses, periodos } = r
+  const { acts, niv, fin, meses, periodos, filas } = r
   const critica = new Set(Object.entries(niv.cpm).flatMap(([id, x]) => (Math.abs(x.holgura) < 1e-6 ? [id] : [])))
   const niveles = [...new Set(acts.map((a) => a.nivel))].sort((a, b) => b - a)
   const vista = acts.filter((a) => nivel === 'todos' || a.nivel === +nivel).sort((a, b) => niv.colocadas[a.id].inicio - niv.colocadas[b.id].inicio || a.id.localeCompare(b.id))
@@ -142,6 +143,8 @@ export default function ProgramaMina() {
             </div>
           ))}
         </div>
+
+        <Escenarios filas={filas} fin={fin} meses={periodos.map((q) => ({ nombre: q.nombre, t: q.t, finos: q.finos }))} />
 
         <div className="grid grid-cols-12 gap-4 items-start">
           {parametros}

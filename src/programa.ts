@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { AVANCE_DISPARO } from './data/minaPiloto'
 import { entrega, type Datos } from './disenos'
 import { duracion } from './domain/modulos'
-import { nivelar, porPeriodo, type ActividadRecurso, type Colocada } from './domain/scheduler'
+import { nivelar, porPeriodo, type ActividadRecurso, type Colocada, type FilaEscenario } from './domain/scheduler'
 import type { Diseno } from './domain/versiones'
 import type { evaluarReservas } from './reservas'
 
@@ -20,9 +20,41 @@ export const PARAM_INICIAL: ParamPrograma = {
   recursos: { Jumbo: 2, Scoop: 2, 'Cuadrilla de relleno': 1 },
   prepMetros: 60,
 }
-export const usePrograma = create<ParamPrograma & { set: (p: Partial<ParamPrograma>) => void; restablecer: () => void }>()(
+/** Escenario aprobado: no se edita; para cambiarlo se cargan sus parámetros y se aprueba otro. */
+export interface Escenario {
+  numero: number
+  nombre: string
+  fecha: string
+  autor: string
+  parametros: ParamPrograma
+  actividades: FilaEscenario[]
+  fin: number
+  meses: { nombre: string; t: number; finos: number }[]
+}
+const soloParametros = ({ tasas, recursos, prepMetros }: ParamPrograma): ParamPrograma => structuredClone({ tasas, recursos, prepMetros })
+
+export const usePrograma = create<
+  ParamPrograma & {
+    escenarios: Escenario[]
+    set: (p: Partial<ParamPrograma>) => void
+    restablecer: () => void
+    aprobar: (e: Omit<Escenario, 'numero' | 'fecha' | 'autor' | 'parametros'>) => void
+    cargar: (numero: number) => void
+  }
+>()(
   persist(
-    (set) => ({ ...PARAM_INICIAL, set: (p) => set(p), restablecer: () => set(PARAM_INICIAL) }),
+    (set, get) => ({
+      ...PARAM_INICIAL,
+      escenarios: [],
+      set: (p) => set(p),
+      restablecer: () => set(soloParametros(PARAM_INICIAL)),
+      aprobar: (e) =>
+        set((s) => ({ escenarios: [...s.escenarios, { ...e, numero: s.escenarios.length + 1, fecha: new Date().toISOString(), autor: 'Ingeniero senior', parametros: soloParametros(s) }] })),
+      cargar: (numero) => {
+        const e = get().escenarios.find((x) => x.numero === numero)
+        if (e) set(soloParametros(e.parametros))
+      },
+    }),
     { name: 'codea-planning-ug/programa', version: 1 },
   ),
 )
@@ -113,5 +145,6 @@ export function calcularPrograma(p: ParamPrograma, reservas: ReturnType<typeof e
   }
   const col = (a: ActividadMina): Colocada => niv.colocadas[a.id]
   const periodos = porPeriodo(acts.map((a) => ({ ...a, dias: col(a).dias })), meses)
-  return { ok: true, errores: [] as string[], acts, niv, fin, meses, periodos } as const
+  const filas: FilaEscenario[] = acts.map((a) => ({ id: a.id, nombre: a.nombre, enlace: a.enlace, cantidad: a.cantidad, unidad: a.unidad, dias: col(a).dias.length, inicio: col(a).inicio, fin: col(a).fin }))
+  return { ok: true, errores: [] as string[], acts, niv, fin, meses, periodos, filas } as const
 }
