@@ -72,8 +72,8 @@ export default function App() {
   })()
 
   return (
-    <div className="h-dvh grid grid-cols-[232px_1fr] max-[900px]:grid-cols-[1fr]">
-      <aside className="border-r border-filete bg-suelo flex flex-col min-h-0 max-[900px]:hidden">
+    <div className="h-dvh grid grid-cols-[232px_1fr] max-[900px]:grid-cols-[1fr] print:block print:h-auto">
+      <aside className="border-r border-filete bg-suelo flex flex-col min-h-0 max-[900px]:hidden print:hidden">
         <a href="#/" className="flex items-baseline gap-2 px-4 pt-5 pb-4">
           <span className="titular text-[19px] tracking-tight">
             CODE<span className="text-coral">a</span>
@@ -136,7 +136,7 @@ export default function App() {
           </button>
         </div>
       </aside>
-      <main className="min-w-0 overflow-y-auto">{pantalla}</main>
+      <main className="min-w-0 overflow-y-auto print:overflow-visible">{pantalla}</main>
     </div>
   )
 }

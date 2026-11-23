@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { fmt } from '../../derive'
-import { resumen, useDisenos, type Datos } from '../../disenos'
+import { piezasCAD, resumen, useDisenos, type Datos } from '../../disenos'
+import { aCSV, aDXF, aSurpac } from '../../domain/deswik'
 import { estadoDiseno, ultima, type Diseno } from '../../domain/versiones'
 import { ir } from '../../ruta'
-import { Boton, Cabecera, Icon, Panel } from '../../ui/kit'
+import { Boton, Cabecera, descargar, Icon, Panel } from '../../ui/kit'
 
 const nombreTipo = (d: Datos) => (d.tipo === 'labor' ? d.clase : 'Tajeo')
 const delta = (a: number | null, b: number | null, dec = 0) => {
@@ -70,6 +71,29 @@ export default function Proyecto() {
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null)
   const elegido = s.disenos.find((x) => x.id === sel) ?? s.disenos[0]
 
+  const exportar = (formato: 'dxf' | 'str' | 'csv') => {
+    const ds = s.disenos.map((d) => ({ d, v: ultima(d) }))
+    if (formato === 'dxf') descargar('proyecto_diseno.dxf', aDXF(ds.flatMap(({ d, v }) => piezasCAD(d.id, v.datos))), 'application/dxf')
+    if (formato === 'str')
+      descargar(
+        'proyecto_diseno.str',
+        aSurpac('proyecto_diseno', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }).replace(/ /g, '-'), ds.map(({ d, v }, i) => ({ numero: i + 1, desc: `${d.id} v${v.numero}`, segmentos: piezasCAD(d.id, v.datos).map((p) => (p.cerrada ? [...p.eje, p.eje[0]] : p.eje)) }))),
+        'text/plain',
+      )
+    if (formato === 'csv')
+      descargar(
+        'proyecto_diseno.csv',
+        '\ufeff' +
+          aCSV(
+            ds.map(({ d, v }) => {
+              const r = resumen(v.datos)
+              return { id: d.id, nombre: d.nombre, tipo: nombreTipo(v.datos), version: v.numero, estado: estadoDiseno(d), publicada: d.publicada ?? '', largo_m: +r.largo.toFixed(2), volumen_m3: Math.round(r.volumen), toneladas: Math.round(r.t), ley_gt: r.ley == null ? '' : +r.ley.toFixed(2), dilucion_pct: r.dilucion == null ? '' : +r.dilucion.toFixed(1) }
+            }),
+          ),
+        'text/csv;charset=utf-8',
+      )
+  }
+
   const abrir = (d: Diseno<Datos>) => {
     s.abrir(d.id, ultima(d).numero)
     ir(ultima(d).datos.tipo === 'labor' ? '/designer/labor' : '/designer/tajeo')
@@ -79,7 +103,24 @@ export default function Proyecto() {
     <div className="pb-10">
       <Cabecera titulo="Proyecto de diseño" detalle="Designer UG · versiones, congelado y publicación a los otros módulos" />
       <div className="px-6 space-y-4">
-        <Panel titulo="Diseños del proyecto">
+        <Panel
+          titulo="Diseños del proyecto"
+          accion={
+            s.disenos.length > 0 && (
+              <span className="flex gap-1.5">
+                <Boton variante="sec" title="Ejes 3D y contornos de tajeo por capa, DXF R12" onClick={() => exportar('dxf')}>
+                  DXF
+                </Boton>
+                <Boton variante="sec" title="Archivo de strings de Surpac (.str)" onClick={() => exportar('str')}>
+                  Surpac
+                </Boton>
+                <Boton variante="sec" title="Atributos y cifras de cada diseño" onClick={() => exportar('csv')}>
+                  CSV
+                </Boton>
+              </span>
+            )
+          }
+        >
           {s.disenos.length === 0 ? (
             <div className="p-6 text-[13px] text-tinta-2 space-y-3">
               <p>Todavía no hay diseños guardados. Dibuja una labor o un tajeo y pulsa «Guardar como v1».</p>

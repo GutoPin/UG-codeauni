@@ -50,7 +50,8 @@ export default function Tajeo() {
 
   // sección transversal a media longitud: la veta ondula con la cota, el tajeo es un paralelogramo con su buzamiento
   const zs = [t.zPiso - 15, t.zPiso + t.alto + 15]
-  const tsx = (y: number) => 110 + y * 9
+  const yMax = Math.max(12, ...[t.zPiso, t.zPiso + t.alto].map((z) => Math.abs(centroTajeo(t, z)) + t.ancho / 2))
+  const tsx = (y: number) => 110 + y * Math.min(9, 100 / yMax)
   const tsz = (z: number) => 8 + ((zs[1] - z) / (zs[1] - zs[0])) * 184
   const veta = Array.from({ length: 41 }, (_, i) => zs[0] + ((zs[1] - zs[0]) * i) / 40)
   const caja = [

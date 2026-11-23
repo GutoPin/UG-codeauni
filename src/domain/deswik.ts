@@ -111,6 +111,8 @@ export interface PiezaDXF {
   /** tajeo: [xmin, xmax, zmin, zmax] en el plano de la veta, a la distancia transversal y */
   caja?: [number, number, number, number]
   y?: number
+  /** polilínea cerrada (contorno) */
+  cerrada?: boolean
 }
 
 const n = (v: number) => String(+v.toFixed(3))
@@ -131,7 +133,7 @@ export function aDXF(piezas: PiezaDXF[]) {
       : (p.eje ?? [])
     if (!pts.length) continue
     // 70 = 8: polilínea 3D; +1: cerrada (contorno del tajeo)
-    out.push(0, 'POLYLINE', 8, ly, 66, 1, 10, 0, 20, 0, 30, 0, 70, p.caja ? 9 : 8)
+    out.push(0, 'POLYLINE', 8, ly, 66, 1, 10, 0, 20, 0, 30, 0, 70, p.caja || p.cerrada ? 9 : 8)
     for (const [x, y, z] of pts) out.push(0, 'VERTEX', 8, ly, 10, n(x), 20, n(y), 30, n(z), 70, 32)
     out.push(0, 'SEQEND', 8, ly)
     const [x, y, z] = p.caja ? [(p.caja[0] + p.caja[1]) / 2, p.y ?? 0, (p.caja[2] + p.caja[3]) / 2] : pts[0]
@@ -139,4 +141,58 @@ export function aDXF(piezas: PiezaDXF[]) {
   }
   out.push(0, 'ENDSEC', 0, 'EOF')
   return out.join('\n') + '\n'
+}
+
+/** Lee las POLYLINE 3D de un DXF ASCII con su capa y el TEXT que las sigue (su código). Ignora el resto de entidades. */
+export function leerDXF(texto: string) {
+  const l = texto.split(/\r?\n/)
+  const pares: [number, string][] = []
+  for (let i = 0; i + 1 < l.length; i += 2) pares.push([+l[i].trim(), l[i + 1].trim()])
+  const out: { id: string | null; capa: string; cerrada: boolean; puntos: P3[] }[] = []
+  let actual: (typeof out)[number] | null = null
+  let v: P3 | null = null
+  let ent = ''
+  for (const [c, val] of pares) {
+    if (c === 0) {
+      if (v && actual) actual.puntos.push(v)
+      v = null
+      ent = val
+      if (val === 'POLYLINE') out.push((actual = { id: null, capa: '', cerrada: false, puntos: [] }))
+      else if (val === 'VERTEX') v = [0, 0, 0]
+      continue
+    }
+    if (ent === 'POLYLINE' && actual) {
+      if (c === 8) actual.capa = val
+      if (c === 70) actual.cerrada = (+val & 1) === 1
+    } else if (ent === 'VERTEX' && v) {
+      if (c === 10) v[0] = +val
+      if (c === 20) v[1] = +val
+      if (c === 30) v[2] = +val
+    } else if (ent === 'TEXT' && c === 1 && out.length && out[out.length - 1].id == null) out[out.length - 1].id = val
+  }
+  return out
+}
+
+/**
+ * Archivo de strings de Surpac (.str, texto): cabecera, registro de ejes, puntos «n, Y, X, Z, descripción»,
+ * un registro nulo (string 0) al final de cada segmento y el registro END. Formato del apéndice de formatos de Surpac.
+ */
+export function aSurpac(nombre: string, fecha: string, strings: { numero: number; segmentos: P3[][]; desc: string }[]) {
+  const f = (v: number) => v.toFixed(3)
+  const nulo = '0, 0.000, 0.000, 0.000,'
+  const pts = strings.flatMap((s) => s.segmentos.flat())
+  const ys = pts.map((p) => p[1])
+  const xs = pts.map((p) => p[0])
+  const z = pts.length ? Math.min(...pts.map((p) => p[2])) : 0
+  const out = [
+    `${nombre}, ${fecha}, ,CODEa Designer UG,`,
+    pts.length ? `0, ${f(Math.min(...ys))}, ${f(Math.min(...xs))}, ${f(z)}, ${f(Math.max(...ys))}, ${f(Math.max(...xs))}, ${f(z)}` : '0, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000',
+  ]
+  for (const s of strings)
+    for (const seg of s.segmentos) {
+      for (const [x, y, zz] of seg) out.push(`${s.numero}, ${f(y)}, ${f(x)}, ${f(zz)}, ${s.desc.replace(/,/g, ' ').slice(0, 32)}`)
+      out.push(nulo)
+    }
+  out.push('0, 0.000, 0.000, 0.000, END')
+  return out.join('\r\n') + '\r\n'
 }

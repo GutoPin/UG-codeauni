@@ -24,7 +24,11 @@ export default function BarraDiseno({ tipo }: { tipo: Tipo }) {
   const aviso = (ok: boolean, t: string) => setMsg({ ok, t })
 
   return (
-    <div className="mx-6 mb-4 bg-panel border border-filete rounded px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]">
+    <>
+    <p className="hidden print:block mx-6 mb-3 text-[13px] text-tinta-2">
+      {d ? `${d.nombre} · v${a.numero}${v?.congelada ? ' congelada' : ' en borrador'}${sucio ? ' con cambios sin guardar' : ''} · ${d.id}` : 'Diseño sin guardar'} · impreso {new Date().toLocaleString('es-PE')}
+    </p>
+    <div className="print:hidden mx-6 mb-4 bg-panel border border-filete rounded px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]">
       {d ? (
         <>
           <span className="font-semibold">{d.nombre}</span>
@@ -64,6 +68,9 @@ export default function BarraDiseno({ tipo }: { tipo: Tipo }) {
                 Nueva versión desde v{a.numero}
               </Boton>
             )}
+            <Boton variante="fant" title="Planta, perfil y secciones de esta versión" onClick={() => window.print()}>
+              Imprimir plano
+            </Boton>
             <Boton variante="fant" onClick={() => ir('/designer/proyecto')}>
               Proyecto
             </Boton>
@@ -96,5 +103,6 @@ export default function BarraDiseno({ tipo }: { tipo: Tipo }) {
         </p>
       )}
     </div>
+    </>
   )
 }

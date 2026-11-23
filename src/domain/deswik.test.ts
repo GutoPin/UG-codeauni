@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aCSV, aDXF, leerCSV, validarPlan } from './deswik'
+import { aCSV, aDXF, aSurpac, leerCSV, leerDXF, validarPlan } from './deswik'
 
 describe('Intercambio Deswik · CSV', () => {
   it('escribe y vuelve a leer comillas, comas y saltos de línea sin perder datos', () => {
@@ -68,5 +68,29 @@ describe('Intercambio Deswik · DXF', () => {
     expect(dxf).toContain('10\n-40\n20\n-14\n30\n3800\n')
     expect(dxf.match(/\nVERTEX\n/g)).toHaveLength(2 + 4)
     expect(dxf).toContain('1\nTJ-3825-04\n')
+  })
+})
+
+describe('CAD: DXF de ida y vuelta y strings de Surpac', () => {
+  it('exportar y volver a importar DXF: geometría sin cambio mayor a 1 mm (ficha 02)', async () => {
+    const { ejeDeTramos, esquinasTajeo } = await import('./designer')
+    const eje = ejeDeTramos([220.123456, -14.98765, 3750.5], 17, [
+      { tipo: 'recta', largo: 33.3333, gradiente: 12 },
+      { tipo: 'curva', radio: 15, giro: 135, gradiente: -8 },
+    ]).puntos
+    const [piso] = esquinasTajeo({ x0: 380, largo: 30, zPiso: 3810, alto: 25, ancho: 8, buzamiento: 65, yCentro: 3 })
+    const leidas = leerDXF(aDXF([{ id: 'DL-01', tipo: 'Rampa', eje }, { id: 'DT-01-PISO', tipo: 'Tajeo', eje: piso, cerrada: true }]))
+    expect(leidas.map((l) => [l.id, l.capa, l.cerrada])).toEqual([['DL-01', 'RAMPA', false], ['DT-01-PISO', 'TAJEO', true]])
+    const err = Math.max(...[eje, piso].flatMap((orig, k) => orig.flatMap((p, i) => p.map((v, j) => Math.abs(v - leidas[k].puntos[i][j])))))
+    expect(leidas[0].puntos).toHaveLength(eje.length)
+    expect(err).toBeLessThanOrEqual(0.001)
+  })
+  it('Surpac: Y antes que X, registro nulo por segmento y END al final', () => {
+    const t = aSurpac('rampa', '26-Nov-26', [{ numero: 1, desc: 'DL-01, Rampa', segmentos: [[[10, 20, 30], [11, 21, 31]]] }]).split('\r\n')
+    expect(t[0]).toBe('rampa, 26-Nov-26, ,CODEa Designer UG,')
+    expect(t[1]).toBe('0, 20.000, 10.000, 30.000, 21.000, 11.000, 30.000')
+    expect(t[2]).toBe('1, 20.000, 10.000, 30.000, DL-01  Rampa')
+    expect(t[4]).toBe('0, 0.000, 0.000, 0.000,')
+    expect(t[5]).toBe('0, 0.000, 0.000, 0.000, END')
   })
 })

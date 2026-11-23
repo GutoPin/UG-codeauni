@@ -190,6 +190,20 @@ export interface Tajeo {
 /** Centro transversal del tajeo a la cota z: con buzamiento < 90° se corre al bajar. */
 export const centroTajeo = (t: Tajeo, z: number) => t.yCentro + (z - (t.zPiso + t.alto / 2)) / Math.tan(rad(t.buzamiento))
 
+/** Contornos de piso y techo del tajeo (4 esquinas cada uno), con el corrimiento del buzamiento. */
+export function esquinasTajeo(t: Tajeo): [V3[], V3[]] {
+  const anillo = (z: number): V3[] => {
+    const c = centroTajeo(t, z)
+    return [
+      [t.x0, c - t.ancho / 2, z],
+      [t.x0 + t.largo, c - t.ancho / 2, z],
+      [t.x0 + t.largo, c + t.ancho / 2, z],
+      [t.x0, c + t.ancho / 2, z],
+    ]
+  }
+  return [anillo(t.zPiso), anillo(t.zPiso + t.alto)]
+}
+
 /**
  * Fracción de cada bloque (cubo de lado `lado`) dentro del tajeo, por muestreo en 5 × 5 × 5 subbloques (ficha 02).
  * Luego tonelaje, ley, finos y dilución: estéril dentro del sólido + sobre-excavación d × área de pared.

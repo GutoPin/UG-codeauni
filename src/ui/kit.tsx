@@ -155,3 +155,12 @@ export function Campo({ l, v, u, paso = 1, onChange, invalido }: { l: string; v:
     </label>
   )
 }
+
+/** Descarga un texto como archivo. */
+export function descargar(nombre: string, texto: string, tipo: string) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([texto], { type: tipo }))
+  a.download = nombre
+  a.click()
+  URL.revokeObjectURL(a.href)
+}

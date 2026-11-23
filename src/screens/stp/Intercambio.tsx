@@ -5,15 +5,7 @@ import { aCSV, aDXF, leerCSV, validarPlan, type CambioPlan } from '../../domain/
 import { estaHabilitada } from '../../domain/stp'
 import { ir } from '../../ruta'
 import { useStore } from '../../store'
-import { Boton, Cabecera, diaCorto, Icon, Panel } from '../../ui/kit'
-
-function descargar(nombre: string, texto: string, tipo: string) {
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(new Blob([texto], { type: tipo }))
-  a.download = nombre
-  a.click()
-  URL.revokeObjectURL(a.href)
-}
+import { Boton, Cabecera, diaCorto, Icon, Panel, descargar } from '../../ui/kit'
 
 const CAPAS = ['Rampa', 'Galería', 'Crucero', 'Chimenea', 'Tajeo'] as const
 

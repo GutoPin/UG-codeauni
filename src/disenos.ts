@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { generarBloques } from './data/minaPiloto'
-import { areaSeccion, ejeDeTramos, evaluarTajeo, validarTramos, type Reglas, type Seccion, type Tajeo, type Tramo } from './domain/designer'
+import { areaSeccion, ejeDeTramos, esquinasTajeo, evaluarTajeo, validarTramos, type Reglas, type Seccion, type Tajeo, type Tramo } from './domain/designer'
 import { congelar, crear, guardar, nuevaVersion, publicar, ultima, type Diseno } from './domain/versiones'
 
 export type ClaseLabor = 'Rampa' | 'Galería' | 'Crucero' | 'Chimenea'
@@ -73,6 +73,16 @@ export function resumen(d: Datos) {
   }
   const r = evaluarTajeo(d.t, BLOQUES, d.ev)
   return { largo: d.t.largo, volumen: r.volumen, t: r.tDiluido, ley: r.leyDiluida, dilucion: r.dilucion, errores: 0 }
+}
+
+/** Geometría para exportar: labor = eje 3D en la capa de su tipo; tajeo = contornos de piso y techo cerrados. */
+export function piezasCAD(id: string, d: Datos) {
+  if (d.tipo === 'labor') return [{ id, tipo: d.clase, eje: ejeDeTramos(d.origen, d.rumbo, d.tramos).puntos, cerrada: false }]
+  const [piso, techo] = esquinasTajeo(d.t)
+  return [
+    { id: `${id}-PISO`, tipo: 'Tajeo', eje: piso, cerrada: true },
+    { id: `${id}-TECHO`, tipo: 'Tajeo', eje: techo, cerrada: true },
+  ]
 }
 
 const AUTOR = 'Ingeniero de planeamiento'

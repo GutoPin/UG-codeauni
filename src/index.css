@@ -98,3 +98,9 @@ input[type='number']::-webkit-inner-spin-button {
 .tabla thead th.text-right {
   text-align: right;
 }
+
+/* plano impreso: se conserva el fondo oscuro tal como se ve en pantalla */
+@media print {
+  @page { size: A3 landscape; margin: 10mm; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
