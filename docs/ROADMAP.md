@@ -7,9 +7,9 @@ definición de hecho (sección 6 del plan) y la aprobación del ingeniero de min
 | Hito | Módulo | Estado |
 |---|---|---|
 | H0 | Fase 0 · Fundación | Parcial: repo, pruebas, mina piloto sintética, docs. Falta CI, contratos de datos, motor 3D común, REPORTS.md |
-| ▶ H1 | Short-Term Planner UG | Demo funcional en navegador (ver abajo) |
-| H2 | Designer UG | Empezado: constructor de labor por tramos y tajeo paramétrico evaluado contra el modelo de bloques (ver abajo) |
-| H3 | Reserves UG | Solo fórmulas + calculadora |
+| H1 | Short-Term Planner UG | Demo funcional en navegador (ver abajo) |
+| H2 | Designer UG | Demo funcional: labor por tramos, tajeo paramétrico, versiones, visor 3D, DXF/Surpac, entregas (ver abajo) |
+| ▶ H3 | Reserves UG | Demo funcional: reservas por tajeo, desarrollo, agregación y versiones (ver abajo) |
 | H4 | Scheduler UG | Fórmulas + CPM con mini-Gantt |
 | H5 | Stope Optimizer | Fórmulas + selección de formas por DP |
 | H6 | Blend UG | Solo fórmulas + calculadora |
@@ -42,6 +42,27 @@ perfil, V = A × L y toneladas; tajeo paramétrico (largo, ancho, alto, buzamien
 por muestreo en 5 × 5 × 5 subbloques: tonelaje, ley, finos, dilución (estéril dentro + sobre-excavación × área de pared),
 ley de corte, traslape con otros tajeos y pilar contra las galerías de nivel.
 
-Falta: guardar el diseño como registros con versiones y congelado, edición de vértices del eje, intersecciones
-automáticas, motor 3D común (hoy el diseño no aparece en el visor 3D), consultas espaciales, servicios, planos,
-intercambio DXF/Surpac/OMF, entrega a Scheduler y Reserves, diseño automático desde Stope Optimizer.
+Hecho después: proyecto con versiones (borrador, congelada, publicada; una congelada no se edita) y comparación entre
+versiones; edición del eje en planta (arrastrar vértice cambia largo o giro del tramo, insertar, reordenar, quitar);
+cruces con labores existentes (intersección propuesta, pilar mínimo, atraviesa tajeo) y autocruce; diseños en el visor 3D
+(borrador translúcido); exportación DXF R12 (ejes 3D y contornos cerrados de tajeo) con lectura de ida y vuelta ≤ 1 mm
+probada, strings de Surpac (.str, formato del apéndice de Surpac) y CSV de atributos; plano impreso A3 de la pantalla;
+entrega de la versión publicada a Scheduler UG (actividad y duración) y a Reserves UG (tajeos).
+
+Falta: vértices libres (el eje es una cadena de tramos tangentes: arrastrar solo cambia largo o giro), suavizado,
+intersecciones con geometría propia (hoy solo se señalan), consultas espaciales, servicios, OMF, importar DXF/Surpac a un
+diseño editable, validar los archivos con Deswik y Surpac reales, plano con rótulo y escala normalizados, diseño automático
+desde Stope Optimizer.
+
+## H3 · Reserves UG: qué hay y qué falta
+
+Hecho (demo): parámetros por método (corte y relleno, taladros largos: ancho mínimo, sobre-rotura, recuperación, pilar,
+costo) y económicos, ley de corte por método; evaluación de los 8 tajeos de la mina piloto y de los tajeos publicados por
+Designer UG contra el modelo de bloques (ancho de minado, dilución, diluido, pilar, recuperado, metal), acceso desde una
+galería de nivel, categoría por la regla «la más baja»; labores de desarrollo a mineral o desmonte con ley de corte
+marginal; agregación por nivel, método y categoría; versiones congeladas con sus parámetros y comparación con causa por
+tajeo; exportación CSV.
+
+Falta: categoría real desde Resource UG (hoy supuesto x ≤ 260 m), ley equivalente multimetal, optimizador de tajeos,
+agregación por periodo (necesita Scheduler UG), conciliación con Reconcile, reporte PDF/Excel con estructura de código
+internacional, aprobación por rol, modo tablet sin señal, publicación a Scheduler UG y NPV Analyzer. Ver QUESTIONS.md 10–12.
