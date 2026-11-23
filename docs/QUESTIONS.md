@@ -44,3 +44,9 @@
 18. **Valor del plan y pilares de Reserves.** El optimizador valora toneladas diluidas y deja pilares entre tajeos
     explícitos; Reserves UG, al recibir la forma, descuenta además su factor de pilar y la recuperación del método.
     ¿Se descuentan los dos, o el factor de pilar de Reserves ya representa los pilares entre tajeos?
+19. **Calidad de las fuentes de mezcla.** La mina piloto no trae dureza ni arsénico; Blend UG usa valores sintéticos por
+    tajeo (13–17 kWh/t, 0,1–0,85 % As) y límites de planta supuestos (16 kWh/t, 0,4 % As, 4–9 g/t, 2 400 t/día).
+    ¿Qué ensayos y límites reales se cargan, y de qué módulo vienen (Grade Control, Met Tests, Mine-to-Mill)?
+20. **Transporte en la mina piloto.** Se supone que los niveles 3800 y 3850 bajan por una chimenea de traspaso de 600 t
+    al NV 3750, que sale 700 t por guardia, y que el pique iza 120 t/h × 11 h × 0,85. ¿Cuál es la red real, las
+    capacidades y si la chimenea debe respetar orden de llegada?

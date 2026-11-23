@@ -11,8 +11,8 @@ definición de hecho (sección 6 del plan) y la aprobación del ingeniero de min
 | H2 | Designer UG | Demo funcional: labor por tramos, tajeo paramétrico, versiones, visor 3D, DXF/Surpac, entregas (ver abajo) |
 | H3 | Reserves UG | Demo funcional: reservas por tajeo, desarrollo, agregación y versiones (ver abajo) |
 | H4 | Scheduler UG | Demo funcional: programa nivelado desde Reserves y Designer, Gantt, plan mensual, escenarios (ver abajo) |
-| ▶ H5 | Stope Optimizer | Demo funcional: formas sobre el modelo de bloques, pilares, escenarios, conversión a Designer (ver abajo) |
-| H6 | Blend UG | Solo fórmulas + calculadora |
+| H5 | Stope Optimizer | Demo funcional: formas sobre el modelo de bloques, pilares, escenarios, conversión a Designer (ver abajo) |
+| ▶ H6 | Blend UG | Demo funcional: mezcla por guardia con solver HiGHS, transporte y chimenea, costos sombra, escenarios, aprobación y CSV (ver abajo) |
 | H7 | Cave Planner | Solo fórmulas + calculadora |
 
 ## H1 · qué hay y qué falta
@@ -100,3 +100,24 @@ ELOS por dominio geotécnico, cámaras y pilares, accesos y subniveles generados
 exportar sólidos DXF/OMF desde aquí (Designer ya exporta DXF), importar formas de Datamine MSO o Deswik SO, prueba con
 200 000 bloques y comparación del valor contra una hoja de referencia (±1 %). Ver QUESTIONS.md 16–17.
 
+
+## H6 · Blend UG: qué hay y qué falta
+
+Hecho (demo): modelo lineal por guardia resuelto con HiGHS (WebAssembly, cargado solo en la pantalla) sobre las guardias
+abiertas de la semana del STP; fuentes = lo que el STP planea volar en tajeos y frentes con ley, solo con la labor
+habilitada, más un acopio de interior y la carga que ya está en la chimenea; lo volado que no sale espera en el tajeo y
+el mineral de frente se limpia en la guardia a planta o a desmonte; límites de planta (capacidad, alimentación mínima,
+ley mín./máx., dureza, arsénico); pique (t/h × horas × disponibilidad), camiones de bajo perfil y chimenea de traspaso
+con nivel, capacidad y salida por guardia; objetivos metal, desvío de ley o costo de transporte; restricciones activas
+con costo sombra (duales de HiGHS; probado contra re-resolver con el límite aflojado); si no hay plan que cumpla, se
+resuelve con holguras penalizadas y se nombra qué límite se rompe y dónde; escenarios «sin cada fuente»; fuentes
+agotadas o fuera; alertas de agotamiento y chimenea llena; plan de la próxima guardia; guardias cerradas fijas con el
+real reportado o «sin reporte»; aprobación con justificación obligatoria si rompe límites y CSV exportado desde la copia
+aprobada.
+
+Falta: horizonte mensual y semanal además de guardia, versión de reservas elegida, red de labores con varias chimeneas,
+tolvas y límite por hora, orden FIFO dentro de la chimenea (hoy el solver elige qué carga sale), regla «no mezclar dos
+tajeos de contaminante alto en la misma guardia» (necesita variables enteras, sin duales), destinos acopio y relleno,
+cadena mina a mercado y penalidades de contrato, re-optimización por guardia con lo extraído, comparación real contra
+plan de ley, cola sin señal en tablet, entrega al STP y a Scheduler (hoy el plan aprobado no lo consume ningún módulo) y
+exportación con el formato real de Metso DPM. Ver QUESTIONS.md 19–20.

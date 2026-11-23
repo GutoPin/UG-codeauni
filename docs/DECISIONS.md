@@ -12,3 +12,7 @@
 - **D-05 · Sin fuentes ni recursos de CDN.** Rótulos 3D con textura de canvas y fuente empaquetada: la vista de tablet
   debe funcionar sin señal.
 - **D-06 · Formato numérico de las fichas** (coma decimal, espacio de miles: «2,7 m», «36 450 t»).
+- **D-07 · Solver lineal HiGHS (`highs`, WebAssembly).** La ficha 06 pide integrar un solver estándar, no construirlo.
+  Se carga con import dinámico solo en Blend UG: el `.wasm` (≈ 4 MB, 1,4 MB comprimido) va como asset local, sin CDN
+  (D-05). El modelo (`src/domain/mezcla.ts`) arma texto LP y recibe la función de resolver, así que en el servidor se
+  puede cambiar por HiGHS nativo u OR-Tools sin tocarlo.
