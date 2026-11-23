@@ -49,6 +49,8 @@ export interface Actividad {
   id: string
   dur: number
   pred: string[]
+  /** desfase (días) por predecesora: fin-inicio + desfase */
+  desfase?: Record<string, number>
 }
 export interface ResultadoCPM {
   es: number
@@ -58,16 +60,19 @@ export interface ResultadoCPM {
   holgura: number
 }
 
-/** CPM fin-inicio sin desfase. Lanza error ante dependencia circular. */
+/** CPM fin-inicio con desfase opcional. Lanza error ante dependencia circular o predecesora desconocida. */
 export function cpm(acts: Actividad[]) {
   const byId = new Map(acts.map((a) => [a.id, a]))
   const orden: string[] = []
   const estado = new Map<string, 1 | 2>()
   const visitar = (id: string) => {
     if (estado.get(id) === 2) return
-    if (estado.get(id) === 1) throw new Error(`Dependencia circular en ${id}`)
     estado.set(id, 1)
-    for (const p of byId.get(id)!.pred) visitar(p)
+    for (const p of byId.get(id)!.pred) {
+      if (!byId.has(p)) throw new Error(`${id} depende de ${p}, que no existe`)
+      if (estado.get(p) === 1) throw new Error(`Dependencia circular: ciclo detectado entre ${p} y ${id}`)
+      visitar(p)
+    }
     estado.set(id, 2)
     orden.push(id)
   }
@@ -76,19 +81,19 @@ export function cpm(acts: Actividad[]) {
   const r: Record<string, ResultadoCPM> = {}
   for (const id of orden) {
     const a = byId.get(id)!
-    const es = Math.max(0, ...a.pred.map((p) => r[p].ef))
+    const es = Math.max(0, ...a.pred.map((p) => r[p].ef + (a.desfase?.[p] ?? 0)))
     r[id] = { es, ef: es + a.dur, ls: 0, lf: 0, holgura: 0 }
   }
   const fin = Math.max(...Object.values(r).map((x) => x.ef))
   for (const id of [...orden].reverse()) {
     const sucesoras = acts.filter((a) => a.pred.includes(id))
-    const lf = sucesoras.length ? Math.min(...sucesoras.map((s) => r[s.id].ls)) : fin
+    const lf = sucesoras.length ? Math.min(...sucesoras.map((s) => r[s.id].ls - (s.desfase?.[id] ?? 0))) : fin
     const x = r[id]
     x.lf = lf
     x.ls = lf - byId.get(id)!.dur
     x.holgura = x.ls - x.es
   }
-  const critica = orden.filter((id) => r[id].holgura === 0)
+  const critica = orden.filter((id) => Math.abs(r[id].holgura) < 1e-9)
   return { r, fin, critica }
 }
 
