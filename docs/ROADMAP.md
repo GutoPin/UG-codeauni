@@ -10,8 +10,8 @@ definición de hecho (sección 6 del plan) y la aprobación del ingeniero de min
 | H1 | Short-Term Planner UG | Demo funcional en navegador (ver abajo) |
 | H2 | Designer UG | Demo funcional: labor por tramos, tajeo paramétrico, versiones, visor 3D, DXF/Surpac, entregas (ver abajo) |
 | H3 | Reserves UG | Demo funcional: reservas por tajeo, desarrollo, agregación y versiones (ver abajo) |
-| ▶ H4 | Scheduler UG | Demo funcional: programa nivelado desde Reserves y Designer, Gantt, plan mensual, escenarios (ver abajo) |
-| H5 | Stope Optimizer | Fórmulas + selección de formas por DP |
+| H4 | Scheduler UG | Demo funcional: programa nivelado desde Reserves y Designer, Gantt, plan mensual, escenarios (ver abajo) |
+| ▶ H5 | Stope Optimizer | Demo funcional: formas sobre el modelo de bloques, pilares, escenarios, conversión a Designer (ver abajo) |
 | H6 | Blend UG | Solo fórmulas + calculadora |
 | H7 | Cave Planner | Solo fórmulas + calculadora |
 
@@ -82,4 +82,21 @@ Falta: dependencias inicio-inicio y fin-fin, actividades manuales e hitos, plant
 zoom), turnos y calendarios 14 × 7, acarreo y movimiento de material, capacidad de chancado e izaje, optimización por VAN,
 mezclas con Blend UG, animación 3D del plan, importar de MS Project/Excel, entrega del plan mensual a Short-Term Planner UG,
 prueba con 2 000 actividades en menos de 10 s y comparación de la ruta crítica con MS Project. Ver QUESTIONS.md 14–15.
+
+## H5 · Stope Optimizer: qué hay y qué falta
+
+Hecho (demo): columnas de 5 m del modelo de bloques evaluadas con el mismo cálculo de Designer y Reserves (la forma
+convertida da el mismo tonelaje); una fila por nivel con piso 5 m sobre la galería; formas candidatas por inicio y largo
+(L mín–L máx) con ley diluida ≥ corte (equilibrio o manual), valor positivo con costo fijo de acceso y acceso desde la
+galería; selección exacta por fila con programación dinámica y pilar mínimo, sin tocar tajeos ya diseñados; ancho mínimo
+del método con su dilución; pilares por área tributaria con FS y ancho recomendado; escenarios precio × ley de corte,
+curvas de toneladas y valor por corte, corridas congeladas; comparación con la disposición actual; CSV; conversión de una
+forma a tajeo en borrador de Designer UG con su método asignado en Reserves UG.
+
+Falta: subniveles dentro de un nivel (hoy una fila por nivel, porque Reserves exige acceso a ≤ 10 m de la galería),
+consolidación 3D entre niveles y suavizado (con rectángulos en malla de 5 m no hay contorno que suavizar), potencia
+variable de la veta (la mina piloto tiene 5 m constantes, así que el ancho mínimo solo muerde con taladros largos),
+ELOS por dominio geotécnico, cámaras y pilares, accesos y subniveles generados desde la forma, visor 3D por valor,
+exportar sólidos DXF/OMF desde aquí (Designer ya exporta DXF), importar formas de Datamine MSO o Deswik SO, prueba con
+200 000 bloques y comparación del valor contra una hoja de referencia (±1 %). Ver QUESTIONS.md 16–17.
 

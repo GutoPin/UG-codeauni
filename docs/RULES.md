@@ -28,5 +28,6 @@ R4 validada por la operación (ver QUESTIONS.md #2). Todas tienen prueba automá
 | 04 Scheduler | CPM con desfase; nivelación serial con calendario; plan por periodo prorrateado por días; comparación de escenarios | `cpm`, `nivelar`, `porPeriodo`, `compararEscenarios` | B 2 d después de A; la de menor prioridad se mueve; 200 actividades | R0 |
 | 05 Stope | Ley de corte de equilibrio; dilución ELOS | `leyCorteEquilibrio`, `dilucionELOS` | 1,12 g/t; 1 120 t | R1 |
 | 05 Stope | Formas sin traslape por DP; esfuerzo de pilar | `seleccionarFormas`, `esfuerzoPilar` | {1,3} = 22; FS 1,5 | R1 |
+| 05 Stope | Formas candidatas por fila; valor con costo fijo; ancho mínimo; pilar por área tributaria y ancho recomendado | `candidatas`, `valorForma`, `anchoForma`, `pilarEntre`, `pilarRecomendado` | DP = fuerza bruta; 1,2 m → 2,0 m; FS exacto con el ancho recomendado; forma convertida < 1 % | R0 |
 | 06 Blend | Ponderado; pique; camiones; chimenea | `ponderado` … `ingresoChimenea` | 6,6 g/t; 459 t; 4; 100 t | R1 |
 | 07 Cave | Tonelaje de columna; radio hidráulico | `tonelajeColumna`, `radioHidraulico` | 36 450 t; 50 m | R1 |

@@ -36,3 +36,8 @@
 15. **Tasas y calendario del programa.** 5,4 m/día de avance, 400 t/día por tajeo, 350 m³/día de relleno, 85 % de
     disponibilidad, 60 m de preparación por tajeo y paradas solo en feriados son valores de demostración. ¿Cuáles son
     los reales, y hay régimen 14 × 7 o paradas programadas?
+16. **Geomecánica de pilares.** El FS usa una cota de superficie supuesta (4 150 m), resistencia de pilar 60 MPa y FS
+    exigido 1,4, con área tributaria a lo largo del rumbo. ¿Cuál es la cota real, la resistencia por dominio y el
+    criterio de FS del cliente? ¿Aplica área tributaria a pilares verticales de una veta?
+17. **Economía del optimizador.** Usa precio, recuperación y costos de Reserves UG, sin costo de venta, y 25 m de acceso
+    por forma a 2 500 USD/m. ¿Cuál es el costo de venta, el desarrollo real por tajeo y su costo por metro?
