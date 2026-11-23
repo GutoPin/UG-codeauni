@@ -30,3 +30,9 @@
 13. **Ley de corte de desarrollo.** La ficha dice «según su ley contra la ley de corte». La demo usa una ley de corte
     marginal (solo planta + administración, 0,60 g/t) porque el avance se paga igual; con la ley de corte del método
     (1,79 g/t) las galerías de 1,2–1,6 g/t irían a desmonte. ¿Qué regla usa la mina?
+14. **Secuencia entre tajeos.** El programa supone que un tajeo produce cuando terminó (y se rellenó, en corte y relleno)
+    el tajeo del nivel de abajo que se le traslapa, y que el relleno va después de toda la producción. ¿Qué reglas de
+    secuencia y qué ciclo corte-relleno usa la mina?
+15. **Tasas y calendario del programa.** 5,4 m/día de avance, 400 t/día por tajeo, 350 m³/día de relleno, 85 % de
+    disponibilidad, 60 m de preparación por tajeo y paradas solo en feriados son valores de demostración. ¿Cuáles son
+    los reales, y hay régimen 14 × 7 o paradas programadas?

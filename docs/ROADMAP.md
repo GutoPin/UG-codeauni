@@ -9,8 +9,8 @@ definición de hecho (sección 6 del plan) y la aprobación del ingeniero de min
 | H0 | Fase 0 · Fundación | Parcial: repo, pruebas, mina piloto sintética, docs. Falta CI, contratos de datos, motor 3D común, REPORTS.md |
 | H1 | Short-Term Planner UG | Demo funcional en navegador (ver abajo) |
 | H2 | Designer UG | Demo funcional: labor por tramos, tajeo paramétrico, versiones, visor 3D, DXF/Surpac, entregas (ver abajo) |
-| ▶ H3 | Reserves UG | Demo funcional: reservas por tajeo, desarrollo, agregación y versiones (ver abajo) |
-| H4 | Scheduler UG | Fórmulas + CPM con mini-Gantt |
+| H3 | Reserves UG | Demo funcional: reservas por tajeo, desarrollo, agregación y versiones (ver abajo) |
+| ▶ H4 | Scheduler UG | Demo funcional: programa nivelado desde Reserves y Designer, Gantt, plan mensual, escenarios (ver abajo) |
 | H5 | Stope Optimizer | Fórmulas + selección de formas por DP |
 | H6 | Blend UG | Solo fórmulas + calculadora |
 | H7 | Cave Planner | Solo fórmulas + calculadora |
@@ -67,3 +67,19 @@ tajeo; exportación CSV.
 Falta: categoría real desde Resource UG (hoy supuesto x ≤ 260 m), ley equivalente multimetal, optimizador de tajeos,
 agregación por periodo (necesita Scheduler UG), conciliación con Reconcile, reporte PDF/Excel con estructura de código
 internacional, aprobación por rol, modo tablet sin señal, publicación a Scheduler UG y NPV Analyzer. Ver QUESTIONS.md 10–12.
+
+## H4 · Scheduler UG: qué hay y qué falta
+
+Hecho (demo): actividades enlazadas por id a Designer UG (desarrollo publicado) y a Reserves UG (por tajeo en reserva:
+preparación → producción → relleno en corte y relleno; el tajeo superior espera al inferior que se le traslapa); duración =
+cantidad / (tasa × disponibilidad); CPM fin-inicio con desfase, holguras y rechazo de ciclos; nivelación serial con recursos
+finitos (prioridad = oro por día de scoop, desempate por holgura) sobre un calendario con feriados; Gantt con filtro por nivel,
+ruta crítica y espera por recurso; utilización mensual por recurso y cuello de botella; plan por mes prorrateado por días
+(desarrollo, planta, ley, oro, desmonte, relleno); escenarios aprobados con comparación y actividades marcadas cuando cambia
+el diseño enlazado; CSV con columnas de MS Project.
+
+Falta: dependencias inicio-inicio y fin-fin, actividades manuales e hitos, plantillas por método, Gantt editable (arrastre,
+zoom), turnos y calendarios 14 × 7, acarreo y movimiento de material, capacidad de chancado e izaje, optimización por VAN,
+mezclas con Blend UG, animación 3D del plan, importar de MS Project/Excel, entrega del plan mensual a Short-Term Planner UG,
+prueba con 2 000 actividades en menos de 10 s y comparación de la ruta crítica con MS Project. Ver QUESTIONS.md 14–15.
+

@@ -25,6 +25,7 @@ R4 validada por la operación (ver QUESTIONS.md #2). Todas tienen prueba automá
 | 03 Reserves | Ley de corte por método; reserva = (diluido − pilar) × recuperación; estado; categoría «la más baja»; comparación de versiones con causa | `leyCorteMetodo`, `reservaTajeo`, `categoriaTajeo`, `compararReservas` | 1,79 g/t; 1 062,5 t y 6 800 g | R0 |
 | 03 Reserves | Ley de corte de desarrollo marginal (planta + adm.) | `leyCorteDesarrollo` | 0,60 g/t | R0 · supuesto, QUESTIONS 13 |
 | 04 Scheduler | Duración; CPM fin-inicio con rechazo de ciclos | `duracion`, `cpm` | 31,4 d; A-C-D 11 d | R1 |
+| 04 Scheduler | CPM con desfase; nivelación serial con calendario; plan por periodo prorrateado por días; comparación de escenarios | `cpm`, `nivelar`, `porPeriodo`, `compararEscenarios` | B 2 d después de A; la de menor prioridad se mueve; 200 actividades | R0 |
 | 05 Stope | Ley de corte de equilibrio; dilución ELOS | `leyCorteEquilibrio`, `dilucionELOS` | 1,12 g/t; 1 120 t | R1 |
 | 05 Stope | Formas sin traslape por DP; esfuerzo de pilar | `seleccionarFormas`, `esfuerzoPilar` | {1,3} = 22; FS 1,5 | R1 |
 | 06 Blend | Ponderado; pique; camiones; chimenea | `ponderado` … `ingresoChimenea` | 6,6 g/t; 459 t; 4; 100 t | R1 |
