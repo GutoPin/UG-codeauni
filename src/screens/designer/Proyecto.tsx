@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { fmt } from '../../derive'
-import { piezasCAD, resumen, useDisenos, type Datos } from '../../disenos'
+import { entrega, piezasCAD, resumen, RITMO, useDisenos, type Datos } from '../../disenos'
 import { aCSV, aDXF, aSurpac } from '../../domain/deswik'
 import { estadoDiseno, ultima, type Diseno } from '../../domain/versiones'
 import { ir } from '../../ruta'
@@ -201,6 +201,75 @@ export default function Proyecto() {
             </p>
           )}
         </Panel>
+
+        {(() => {
+          const es = s.disenos.map(entrega).filter((e) => e != null)
+          if (!es.length) return null
+          return (
+            <Panel titulo="Entregas de las versiones publicadas">
+              <div className="grid grid-cols-2 max-[1100px]:grid-cols-1 divide-x divide-filete max-[1100px]:divide-x-0">
+                <div>
+                  <h3 className="px-4 pt-3 pb-1 text-[13px] font-semibold">A Scheduler UG · actividades</h3>
+                  <table className="w-full text-[13px]">
+                    <thead>
+                      <tr className="text-left rotulo border-b border-filete">
+                        <th className="px-4 py-2 font-semibold">Actividad</th>
+                        <th className="px-3 py-2 font-semibold text-right">Cantidad</th>
+                        <th className="px-4 py-2 font-semibold text-right">Duración</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-filete">
+                      {es.map((e) => (
+                        <tr key={e.id}>
+                          <td className="px-4 py-2">
+                            {e.nombre} <span className="text-tinta-3">v{e.version}</span>
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {fmt(e.actividad.cantidad, e.actividad.unidad === 'm' ? 1 : 0)} {e.actividad.unidad}
+                          </td>
+                          <td className="px-4 py-2 text-right">{fmt(e.actividad.dias, 1)} días</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="px-4 py-2.5 text-[11.5px] text-tinta-3">
+                    Duración = cantidad / (ritmo × disponibilidad): {fmt(RITMO.mDia, 1)} m/día en desarrollo, {fmt(RITMO.tDia)} t/día en tajeos, {fmt(RITMO.disp * 100)} %.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="px-4 pt-3 pb-1 text-[13px] font-semibold">A Reserves UG · tajeos</h3>
+                  {es.some((e) => e.datos.tipo === 'tajeo') ? (
+                    <table className="w-full text-[13px]">
+                      <thead>
+                        <tr className="text-left rotulo border-b border-filete">
+                          <th className="px-4 py-2 font-semibold">Tajeo</th>
+                          <th className="px-3 py-2 font-semibold text-right">Diluido</th>
+                          <th className="px-4 py-2 font-semibold text-right">Ley diluida</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-filete">
+                        {es
+                          .filter((e) => e.datos.tipo === 'tajeo')
+                          .map((e) => (
+                            <tr key={e.id}>
+                              <td className="px-4 py-2">
+                                {e.nombre} <span className="text-tinta-3">v{e.version}</span>
+                              </td>
+                              <td className="px-3 py-2 text-right">{fmt(e.resumen.t)} t</td>
+                              <td className="px-4 py-2 text-right">{fmt(e.resumen.ley ?? 0, 2)} g/t</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className="px-4 py-3 text-[12.5px] text-tinta-3">Ningún tajeo publicado todavía.</p>
+                  )}
+                  <p className="px-4 py-2.5 text-[11.5px] text-tinta-3">Reserves UG los evalúa con el método, la recuperación y la ley de corte de su versión.</p>
+                </div>
+              </div>
+            </Panel>
+          )
+        })()}
 
         {elegido && (
           <Panel titulo={`Comparación de versiones · ${elegido.nombre}`}>

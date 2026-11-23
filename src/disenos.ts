@@ -1,8 +1,9 @@
 // Diseños del Designer UG: almacenamiento propio, así «Reiniciar demo» y los cambios de la mina piloto no los borran.
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { generarBloques } from './data/minaPiloto'
+import { AVANCE_DISPARO, generarBloques } from './data/minaPiloto'
 import { areaSeccion, ejeDeTramos, esquinasTajeo, evaluarTajeo, validarTramos, type Reglas, type Seccion, type Tajeo, type Tramo } from './domain/designer'
+import { duracion } from './domain/modulos'
 import { congelar, crear, guardar, nuevaVersion, publicar, ultima, type Diseno } from './domain/versiones'
 
 export type ClaseLabor = 'Rampa' | 'Galería' | 'Crucero' | 'Chimenea'
@@ -83,6 +84,26 @@ export function piezasCAD(id: string, d: Datos) {
     { id: `${id}-PISO`, tipo: 'Tajeo', eje: piso, cerrada: true },
     { id: `${id}-TECHO`, tipo: 'Tajeo', eje: techo, cerrada: true },
   ]
+}
+
+// shortcut: ritmos fijos de la mina piloto (un disparo por guardia, 400 t/día por tajeo, 85 % de disponibilidad); tomarlos de Scheduler UG cuando exista
+export const RITMO = { mDia: 2 * AVANCE_DISPARO, tDia: 400, disp: 0.85 }
+
+/** Lo que una versión publicada entrega: actividad para Scheduler UG y, si es tajeo, tonelaje para Reserves UG. */
+export function entrega(d: Diseno<Datos>) {
+  const v = d.versiones.find((x) => x.numero === d.publicada)
+  if (!v) return null
+  const r = resumen(v.datos)
+  const labor = v.datos.tipo === 'labor'
+  const cantidad = labor ? r.largo : r.t
+  return {
+    id: d.id,
+    nombre: d.nombre,
+    version: v.numero,
+    datos: v.datos,
+    resumen: r,
+    actividad: { cantidad, unidad: labor ? 'm' : 't', ritmo: labor ? RITMO.mDia : RITMO.tDia, dias: duracion(cantidad, labor ? RITMO.mDia : RITMO.tDia, RITMO.disp) },
+  }
 }
 
 const AUTOR = 'Ingeniero de planeamiento'
