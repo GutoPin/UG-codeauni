@@ -20,6 +20,9 @@ importers:
       echarts:
         specifier: ^6.1.0
         version: 6.1.0
+      highs:
+        specifier: ^1.16.0
+        version: 1.16.0
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -768,6 +771,10 @@ packages:
 
   graceful-fs@4.2.12:
     resolution: {integrity: sha512-iuyGF2E4oafQfPsRrG2wtY2ILupMhvtdrhzrxB+0VcjsPpSPttpfYdjnGFGsTi5MaJFjI1jOKHPQ6UTbTj9TAw==}
+
+  highs@1.16.0:
+    resolution: {integrity: sha512-Xo6becljpv6y1lYKwAOtqv6YDtCKxXWk/84Ik5dnol2BBqNv3T4wShd93a9Tv6vdMoY9Pn8y4zJ5yj3idRrY4g==}
+    engines: {node: '>=18'}
 
   hls.js@1.7.4:
     resolution: {integrity: sha512-3GlxGdPvT2YHvQYOt+yOzT/DEior/qJVNIylHA77kgeoBTdQQqi70GwefNEUmHQeNGyjC8U62+bruqW/Tpm+tg==}
@@ -1690,6 +1697,8 @@ snapshots:
   glsl-noise@0.0.0: {}
 
   graceful-fs@4.2.12: {}
+
+  highs@1.16.0: {}
 
   hls.js@1.7.4: {}
 

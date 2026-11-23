@@ -18,6 +18,7 @@ import ProgramaMina from './screens/scheduler/ProgramaMina'
 
 const Visor = lazy(() => import('./screens/Visor'))
 const Optimizador = lazy(() => import('./screens/stope/Optimizador'))
+const Mezcla = lazy(() => import('./screens/blend/Mezcla'))
 // echarts solo se descarga al abrir Cumplimiento
 const Cumplimiento = lazy(() => import('./screens/stp/Cumplimiento'))
 
@@ -71,6 +72,7 @@ export default function App() {
     if (ruta === '/reserves') return <Reservas />
     if (ruta === '/scheduler') return <ProgramaMina />
     if (ruta === '/stope') return <Suspense><Optimizador /></Suspense>
+    if (ruta === '/blend') return <Suspense><Mezcla /></Suspense>
     if (ruta === '/mina') return <Suspense><Visor /></Suspense>
     const m = MODULOS.find((x) => `/modulo/${x.id}` === ruta)
     if (m) return <Calculadora key={m.id} modulo={m} />
@@ -142,6 +144,15 @@ export default function App() {
             </div>
             <Enlace r="/stope" actual={ruta} icono="stope">
               Optimizador de tajeos
+            </Enlace>
+          </div>
+          <div>
+            <div className="flex items-center justify-between px-2.5 mb-1.5">
+              <span className="rotulo">Blend UG</span>
+              <span className="text-[10.5px] text-tinta-2 font-semibold" title="Hito 6 del plan de trabajo">H6</span>
+            </div>
+            <Enlace r="/blend" actual={ruta} icono="blend">
+              Mezcla y alimentación
             </Enlace>
           </div>
           <div>
