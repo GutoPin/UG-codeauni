@@ -13,6 +13,7 @@ import Calculadora, { MODULOS } from './screens/modulos/Calculadora'
 import DisenoLabor from './screens/designer/Labor'
 import DisenoTajeo from './screens/designer/Tajeo'
 import DisenoProyecto from './screens/designer/Proyecto'
+import Reservas from './screens/reserves/Reservas'
 
 const Visor = lazy(() => import('./screens/Visor'))
 // echarts solo se descarga al abrir Cumplimiento
@@ -65,6 +66,7 @@ export default function App() {
     if (ruta === '/designer/labor') return <DisenoLabor />
     if (ruta === '/designer/tajeo') return <DisenoTajeo />
     if (ruta === '/designer/proyecto') return <DisenoProyecto />
+    if (ruta === '/reserves') return <Reservas />
     if (ruta === '/mina') return <Suspense><Visor /></Suspense>
     const m = MODULOS.find((x) => `/modulo/${x.id}` === ruta)
     if (m) return <Calculadora key={m.id} modulo={m} />
@@ -110,6 +112,15 @@ export default function App() {
                 </Enlace>
               ))}
             </div>
+          </div>
+          <div>
+            <div className="flex items-center justify-between px-2.5 mb-1.5">
+              <span className="rotulo">Reserves UG</span>
+              <span className="text-[10.5px] text-tinta-2 font-semibold" title="Hito 3 del plan de trabajo">H3</span>
+            </div>
+            <Enlace r="/reserves" actual={ruta} icono="reserves">
+              Reservas por tajeo
+            </Enlace>
           </div>
           <div>
             <div className="px-2.5 mb-1.5 rotulo">Calculadoras de la familia</div>

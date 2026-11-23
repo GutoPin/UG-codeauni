@@ -20,3 +20,10 @@
    por equipo y por punto de carga?
 9. **Metas de la semana.** Se tomó como meta el programa original (t y m) y una ley objetivo de 6,5 g/t. ¿Quién fija
    las metas semanales y la ley que pide la planta? ¿Cuánto pesa cada objetivo en la reoptimización?
+10. **Ley para reservas.** Reserves UG toma la ley del modelo de bloques y el programa semanal usa la ley de cada labor
+    (`Labor.ley`); en la mina piloto no coinciden (p. ej. Tajeo 3875-02: 0,83 g/t en bloques). ¿Cuál es la fuente
+    oficial de ley por tajeo y cómo se concilian?
+11. **Categoría de recurso.** La mina piloto no trae medido/indicado; se supuso medido hasta x = 260 m. ¿Qué malla de
+    sondajes define cada categoría, y la regla «toma la más baja» vale o se prorratea por tonelaje?
+12. **Parámetros por método.** Corte y relleno (3 m, 0,3 m de sobre-rotura, 95 %, 5 % en pilares, 70 US$/t) y taladros
+    largos (6 m, 0,6 m, 88 %, 10 %, 45 US$/t) son valores de demostración. ¿Cuáles son los de la mina?
