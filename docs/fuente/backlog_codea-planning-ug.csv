@@ -1,0 +1,478 @@
+﻿"Title","Body","Labels","Milestone"
+"[Short-Term Planner UG] Modelo de datos y migraciones","Entidades: Programa, LaborProgramada, Asignacion, Tarea, Meta, CausaDesvio, Habilitacion, CumplimientoGuardia, TirajePunto, EstadoAutomatizacion.
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,datos","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Programa","- [ ] Programa semanal por labor: avance, disparos, toneladas, metros perforados y sostenimiento
+- [ ] Programa diario y por guardia; carga manual inicial sin depender de Scheduler
+- [ ] Gantt de tareas para desarrollo, producción y mantenimiento con asignación de recursos y seguimiento (programación gráfica)
+- [ ] Vista 3D del programa por guardia con avance real y optimizador
+- [ ] Programación realizable de la guardia actual y la siguiente
+- [ ] Plan mayor recibido de Scheduler y enviado a operación
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Asignación","- [ ] Asignación de equipo y cuadrilla por guardia con cuadrillas, tareas y ubicaciones enlazadas al modelo y diseño
+- [ ] Asignación sugerida por Sim y por un optimizador con objetivos múltiples
+- [ ] Gestión de tareas del turno con revisión del cumplimiento
+- [ ] Alerta si la labor no tiene equipo o no está habilitada por ventilación o sostenimiento
+- [ ] Programación operacional alineada a metas y restricciones
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Ejecución","- [ ] Tareas en tablet con inicio, fin y cantidad, en línea y sin señal
+- [ ] Cada tarea medida con tiempos
+- [ ] Reoptimización con lo real: reprogramar con los pendientes
+- [ ] Planes con perforación y voladura vinculados a Face, Ring y Explosives
+- [ ] Control de mineral por cortes y ruteo con reportes
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Seguimiento","- [ ] Tablero de cumplimiento diario plan vs. real, sin digitar
+- [ ] Registro de la causa del desvío por labor
+- [ ] Pareto de causas y cumplimiento por supervisor y guardia
+- [ ] Planificación y reporte de producción
+- [ ] Cadena unificada de plan, ejecución del turno y seguimiento
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Hundimiento","- [ ] Programa de tiraje de hundimiento por punto de extracción que equilibra corto y largo plazo
+- [ ] Control diario por punto y guardia
+- [ ] Restricciones de extracción y de cuadrillas
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Automatización e integración","- [ ] Entregar el plan y el turno a la automatización de equipos (Epiroc) y leer su estado
+- [ ] Intercambio con archivos de Deswik por CSV y DXF
+- [ ] Recomendaciones del agente de planeamiento
+- [ ] Programa de la mezcla de corto plazo con Blend UG
+- [ ] Cadena integrada de planeamiento, simulación de acarreo, turno y mantenimiento con módulos CODEa
+
+Ver ficha 01_Short_Term_Planner_UG.md.","planning,ug,modulo:C4U,funcionalidad","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Pantallas","- [ ] Programa semanal por labor
+- [ ] Gantt de tareas y recursos
+- [ ] Vista 3D con avance real
+- [ ] Programa de la guardia en tablet
+- [ ] Asignación de equipo y cuadrilla
+- [ ] Tablero de cumplimiento
+- [ ] Causas de desvío y Pareto
+- [ ] Reprogramación
+- [ ] Tiraje de hundimiento
+- [ ] Estado de la automatización","planning,ug,modulo:C4U,ui","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Integraciones","- [ ] Epiroc Deep Automation: entregar plan y turno y leer su estado; automatización de terceros, integrar, no construir.
+- [ ] Archivos de Deswik por CSV y DXF.
+- [ ] Mensajería: integrar.","planning,ug,modulo:C4U,integracion","H1 Short-Term Planner UG"
+"[Short-Term Planner UG] Pruebas y criterios de aceptación","- [ ] Plan 45 m y real 36 m: 80 %.
+- [ ] Barreno 3,0 m y eficiencia 0,90: 2,7 m por disparo; con sección 18 m2 y 2,8 t/m3: 136 t.
+- [ ] Labor sin ventilación: no se programa.
+- [ ] Equipo en dos tareas a la misma hora: error.
+- [ ] Tarea marcada sin señal: queda en cola y se sincroniza sin duplicarse.
+- [ ] Pendiente de 9 m arrastrado: aparece sumado al siguiente día.
+
+Criterios:
+- [ ] Programa semanal armado en menos de 30 minutos
+- [ ] Cumplimiento diario calculado sin digitar
+- [ ] Sin señal no se pierde ninguna marca de tarea
+- [ ] Recalcular reprogramación de 100 tareas en menos de 5 segundos","planning,ug,modulo:C4U,pruebas","H1 Short-Term Planner UG"
+"[Designer UG] Modelo de datos y migraciones","Entidades: ProyectoDiseno, Nivel, SeccionTipo, Labor, Tajeo, Servicio, EvaluacionDiseno, ReglaDiseno, Interferencia, VersionDiseno.
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,datos","H2 Designer UG"
+"[Designer UG] Diseño de labores","- [ ] Labor por eje 3D con sección tipo barrida (herradura, rectangular, circular, personalizada)
+- [ ] Rampas con gradiente máxima y radio de giro validados mientras se dibuja, incluida rampa en espiral y alternativa de rampa en retorno
+- [ ] Galerías, cruceros, cámaras, chimeneas y piques con intersecciones automáticas
+- [ ] Biblioteca de secciones tipo con área calculada y sobre-excavación planificada
+- [ ] Reglas de diseño por proyecto con aviso inmediato al violarlas
+- [ ] Edición del eje (mover vértice, insertar, suavizar curva) que regenera el sólido
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Tajeos","- [ ] Tajeo como sólido: dibujado, extruido desde polígono por nivel o importado
+- [ ] Tajeo paramétrico: largo, ancho, altura, buzamiento y espaciado entre subniveles como parámetros editables
+- [ ] Diseño automático del tajeo a partir de la forma óptima de Stope Optimizer: genera el sólido editable más los accesos y subniveles
+- [ ] Secuencia de minado y pilares como atributos del tajeo
+- [ ] Cálculo del volumen vacío para relleno
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Base de datos espacial de diseño","- [ ] Cada objeto (rampa, galería, tajeo, nivel) es un registro con geometría y atributos consultables
+- [ ] Consultas por atributo y por zona espacial, por ejemplo todas las galerías del nivel 3900 sin sostenimiento asignado
+- [ ] Un único motor 3D y una base compartida para sondajes, diseño, topografía y estimación
+- [ ] Historial de versiones y comparación entre versiones
+- [ ] Capas, colores y etiquetas por atributo
+- [ ] Tabla de atributos editable en bloque
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Evaluación","- [ ] Intersección de sólidos con el modelo de bloques (fracción de bloque dentro)
+- [ ] Tonelaje, ley, densidad, finos y dilución por labor, tajeo, nivel y método
+- [ ] Evaluación con tope por ley de corte y categoría del recurso
+- [ ] Entrega de la evaluación a Reserves para agregar por labor y periodo
+- [ ] Reporte de metros lineales y volúmenes por tipo de labor
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Servicios y chequeo","- [ ] Trazado de tuberías de agua y aire comprimido, cables de energía y drenaje a lo largo de las labores, con longitudes y cantidades
+- [ ] Chequeo de interferencias: distancia mínima entre labores, cruces no previstos, tajeo contra labor, pilares
+- [ ] Chequeo contra topografía real: labor que sale de la roca o choca con vacíos existentes
+- [ ] Informe de reglas violadas con ubicación
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Intercambio de archivos","- [ ] Importar y exportar Surpac: strings, DTM, modelos de bloques y sondajes
+- [ ] DXF de ida y vuelta con AutoCAD
+- [ ] OBJ, CSV, TXT y XYZ, incluidos mapas de calor de atributos
+- [ ] Archivos de Deswik: intercambio por DXF, CSV y tablas de atributos, sin construir el formato propietario
+- [ ] OMF para modelos y superficies
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Entrega a otros módulos","- [ ] Labores y duraciones por metro a Scheduler UG
+- [ ] Objetivos de avance a Face y de anillos a Ring
+- [ ] Trazado de aire y servicios a Network
+- [ ] Diseño a Conformance UG y reservas a Reserves UG
+- [ ] Publicación de versión congelada y notificación
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Planos","- [ ] Planos por nivel, secciones transversales y longitudinales
+- [ ] Leyendas, cotas, escalas y cuadro de rotulación
+- [ ] Exportación a PDF y DXF
+
+Ver ficha 02_Designer_UG.md.","planning,ug,modulo:C1U,funcionalidad","H2 Designer UG"
+"[Designer UG] Pantallas","- [ ] Visor 3D de diseño: labores, tajeos, modelo de bloques, topografía y as-built
+- [ ] Constructor de labor: eje, sección tipo, gradiente y radio con indicadores en vivo
+- [ ] Biblioteca de secciones tipo
+- [ ] Tabla de atributos y consultas espaciales
+- [ ] Editor de tajeo paramétrico
+- [ ] Resultado de Stope Optimizer y conversión a tajeo con accesos
+- [ ] Evaluación contra modelo de bloques: tabla y mapa de calor
+- [ ] Informe de interferencias y reglas
+- [ ] Servicios: trazado y cantidades
+- [ ] Versiones del diseño y comparación
+- [ ] Importar y exportar","planning,ug,modulo:C1U,ui","H2 Designer UG"
+"[Designer UG] Integraciones","- [ ] Surpac (formatos de strings, DTM, bloques, sondajes): importar y exportar, no construir el software.
+- [ ] AutoCAD DXF: intercambio ida y vuelta, formato estándar.
+- [ ] OBJ, CSV, TXT, XYZ: salida de superficies y mapas de calor.
+- [ ] Deswik: interoperar por DXF y CSV; el formato nativo propietario solo si el proveedor documenta su interfaz.
+- [ ] OMF (Open Mining Format) para modelos.","planning,ug,modulo:C1U,integracion","H2 Designer UG"
+"[Designer UG] Pruebas y criterios de aceptación","- [ ] Rampa de 100 m horizontales con gradiente 12 %: desnivel = 12 m; con gradiente máxima 10 % debe dar error.
+- [ ] Curva R = 15 m, 180 grados, gradiente 12 %: arco 47,1 m y desnivel 5,65 m.
+- [ ] Bloque 5 x 5 x 5 m con 60 % dentro y densidad 2,8: tonelaje 210 t.
+- [ ] Tajeo de 30 x 8 x 25 m a 2,9 t/m3: 17 400 t brutos.
+- [ ] Rampa y 3 tajeos contra un caso de referencia: tonelaje y ley iguales dentro de 1 %.
+- [ ] Dos galerías con ejes a 5 m y sección de 4 m con pilar mínimo de 3 m: se marca interferencia.
+- [ ] Importar y exportar DXF y volver a importar: geometría sin cambio mayor a 1 mm.
+
+Criterios:
+- [ ] Rampa y 3 tajeos con tonelaje y ley iguales (+-1 %) a un caso de referencia
+- [ ] Un diseño de 500 objetos se evalúa contra un modelo de 5 millones de bloques en menos de 5 minutos
+- [ ] Consulta por atributo y zona responde en menos de 2 segundos
+- [ ] DXF exportado abre sin errores en AutoCAD","planning,ug,modulo:C1U,pruebas","H2 Designer UG"
+"[Reserves UG] Modelo de datos y migraciones","Entidades: ParámetrosMétodo, TajeoEvaluado, ReservaTajeo, LaborDesarrolloEval, VersiónReservas, ParámetrosEconómicos, PropuestaOptimizador, ReservaAgregada, ConciliaciónTajeo, DilucionObservada.
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,datos","H3 Reserves UG"
+"[Reserves UG] Evaluación de tajeos y labores","- [ ] Cruzar cada tajeo y labor de desarrollo con el modelo de bloques de veta para obtener tonelaje y ley in situ (MinePlan Reserves: cálculo de reservas sobre los diseños)
+- [ ] Ancho mínimo de minado por método y recorte a ese ancho
+- [ ] Dilución planificada y no planificada por tajeo, con valores por defecto del método y ajuste manual
+- [ ] Recuperación minera por método y por tipo de tajeo (con o sin pilar)
+- [ ] Evaluar labores de desarrollo: mineral o desmonte según su ley contra la ley de corte
+- [ ] Ley equivalente para varios metales con precios y recuperaciones
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Optimización de tajeos (Studio UG)","- [ ] Optimizador de tajeos sobre el modelo: formas que superan la ley de corte con ancho mínimo y altura de nivel (Datamine Studio UG: diseño y reservas subterráneas con optimizador de tajeos)
+- [ ] Comparar la forma optimizada con el diseño y ver el valor ganado o perdido
+- [ ] Reglas de pilares y distancia a labores existentes
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Agregación de reservas","- [ ] Agregar tajeos y labores evaluados en reservas de mina por labor, nivel, método y periodo (Deswik Agg)
+- [ ] Agregación por categoría (probada, probable) y por zona geotécnica
+- [ ] Reserva de mina tabulada con tonelaje, ley, metal contenido y recuperación
+- [ ] Marcar tajeos con acceso pendiente, bajo ley de corte o con restricciones
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Parámetros, versiones y trazabilidad","- [ ] Parámetros económicos y de método guardados con cada versión
+- [ ] Congelar versión aprobada y compararla con otra versión
+- [ ] Trazabilidad: de cada total hasta el tajeo, el bloque y el parámetro usado
+- [ ] Cálculo de ley de corte por método y por zona
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Conciliación y reportes","- [ ] Comparar reservas con la producción real de Reconcile por tajeo (tonelaje, ley, dilución real)
+- [ ] Reporte de reservas por nivel y por método en Excel y PDF
+- [ ] Estructura de reporte compatible con códigos internacionales; validar la norma vigente
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Trabajo sin señal","- [ ] Consultar la última versión congelada de reservas en tablet bajo tierra, solo lectura
+- [ ] Ajustes de dilución observada por el geólogo en el tajeo quedan en cola y se sincronizan al volver la señal
+
+Ver ficha 03_Reserves_UG.md.","planning,ug,modulo:PLA1U,funcionalidad","H3 Reserves UG"
+"[Reserves UG] Pantallas","- [ ] Parámetros por método: ancho mínimo, dilución, recuperación y ley de corte por método de minado
+- [ ] Evaluación de tajeos: lista con tonelaje, ley, ancho y dilución por tajeo
+- [ ] Tajeo 3D: forma, bloques y pilares sobre las labores de cada nivel
+- [ ] Optimizador de tajeos: formas propuestas, valor y comparación con el diseño
+- [ ] Reservas por nivel y método: tablas agregadas con categoría
+- [ ] Labores de desarrollo: mineral y desmonte por labor
+- [ ] Comparación de versiones: cambio de tonelaje y ley con causas
+- [ ] Conciliación con Reconcile: plan contra extraído por tajeo
+- [ ] Modo tablet sin señal: reserva del tajeo y registro de dilución observada","planning,ug,modulo:PLA1U,ui","H3 Reserves UG"
+"[Reserves UG] Integraciones","- [ ] Excel y PDF: exportar.
+- [ ] Formato de modelos de bloques y de sólidos de otros paquetes (Datamine, Deswik, MinePlan) por archivo: integrar, no construir.
+- [ ] Códigos JORC y NI 43-101: se sigue su estructura de reporte; validar con el texto vigente de la norma peruana aplicable.
+- [ ] Solver estándar para el optimizador de tajeos: integrar, no construir un solver propio.","planning,ug,modulo:PLA1U,integracion","H3 Reserves UG"
+"[Reserves UG] Pruebas y criterios de aceptación","- [ ] Veta de 0,6 m con mínimo de 1,2 m: ancho de minado 1,2 m y dilución planificada 100 %.
+- [ ] 1 000 t a 8,0 g/t con 25 % de dilución a 0 g/t: 1 250 t a 6,4 g/t.
+- [ ] 1 250 t con recuperación de 85 %: 1 062,5 t recuperadas.
+- [ ] Costo 105 US$/t, precio 65 US$/g y recuperación 0,90: ley de corte 1,79 g/t; un tajeo de 1,5 g/t no entra a reservas.
+- [ ] Tajeo de 15 660 t con 10 % de pilar: 1 566 t dejadas y 14 094 t evaluables.
+- [ ] Versión congelada: no permite cambiar la dilución; pide crear versión nueva.
+- [ ] Dilución observada de 0,3 m cargada sin señal: se sincroniza una vez al volver la señal.
+
+Criterios:
+- [ ] Cada total de reserva se puede abrir hasta el tajeo y el parámetro que lo produjo.
+- [ ] Una evaluación de 300 tajeos termina en menos de 5 minutos.
+- [ ] Las diferencias contra la versión anterior se explican por cambio de parámetro, diseño o recurso.
+- [ ] La conciliación por tajeo coincide con Reconcile.","planning,ug,modulo:PLA1U,pruebas","H3 Reserves UG"
+"[Scheduler UG] Modelo de datos y migraciones","Entidades: Actividad, Dependencia, Recurso, AsignacionRecurso, Calendario, Escenario, ResultadoPeriodo, MovimientoMaterial, PlantillaActividad, Destino.
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,datos","H4 Scheduler UG"
+"[Scheduler UG] Actividades y diseño","- [ ] Crear actividades desde labores y tajeos del diseño con enlace dinámico: al cambiar el diseño se actualizan duraciones y recursos
+- [ ] Actividad manual y hitos
+- [ ] Plantillas de actividades por método de minado y por producto (lógica predefinida sin scripts)
+- [ ] Dependencias fin-inicio, inicio-inicio y fin-fin con desfase
+- [ ] Calendarios y turnos con feriados y paradas
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Gantt y cálculo","- [ ] Gantt interactivo con zoom, arrastre y filtro por nivel
+- [ ] Ruta crítica y holguras
+- [ ] Tasas por tipo de actividad y ciclo de avance
+- [ ] Duración por cantidad y tasa con factores de disponibilidad
+- [ ] Importar y exportar a MS Project y Excel
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Recursos","- [ ] Recursos con capacidad (jumbos, scoops, camiones, cuadrillas)
+- [ ] Nivelación con recursos finitos por prioridad
+- [ ] Utilización por periodo con alertas de sobrecarga
+- [ ] Cuellos de botella por recurso
+- [ ] Motor de acarreo: mina a planta con camiones y scoops (importar de Sim) para ajustar tasas
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Movimiento de material","- [ ] Modelar movimiento de material, botaderos de desmonte, relleno y acarreo, incluidos camiones eléctricos, troles y fajas, como insumo del programa
+- [ ] Capacidad de chancado y de izaje
+- [ ] Reglas de destino por ley de corte
+- [ ] Tiempos de viaje y de ciclo por ruta
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Optimización y escenarios","- [ ] Optimización automática de la secuencia con reglas de prioridad
+- [ ] Secuencia óptima por VAN con valor del tiempo
+- [ ] Programación mediano plazo con restricciones y metas de producción
+- [ ] Escenarios con comparación animada en 3D
+- [ ] Plan por periodo (mes, trimestre, año) y por escenario
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Mezclas y destinos","- [ ] Destinos y mezclas por periodo con enlace a Blend UG
+- [ ] Tonelaje por destino y periodo
+- [ ] Ley y finos por periodo
+- [ ] Entrega del plan de alimentación a la planta
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Integraciones y reportes","- [ ] Cadena integrada de planeamiento, corto plazo, acarreo, turno y mantenimiento con módulos CODEa
+- [ ] Reportes por periodo: metros, toneladas, ley, finos, recursos
+- [ ] Exportar plan a simulaciones dinámicas de pilas y stockpiles (METSIM)
+- [ ] Importar y exportar de Deswik y otros por CSV y DXF
+
+Ver ficha 04_Scheduler_UG.md.","planning,ug,modulo:C3U,funcionalidad","H4 Scheduler UG"
+"[Scheduler UG] Pantallas","- [ ] Gantt del programa
+- [ ] Árbol de actividades y diseño enlazado
+- [ ] Calendarios y turnos
+- [ ] Recursos y utilización
+- [ ] Ruta crítica y holguras
+- [ ] Movimiento de material y acarreo
+- [ ] Animación 3D del plan
+- [ ] Comparación de escenarios
+- [ ] Destinos y mezclas
+- [ ] Reportes por periodo
+- [ ] Exportar a MS Project y Excel","planning,ug,modulo:C3U,ui","H4 Scheduler UG"
+"[Scheduler UG] Integraciones","- [ ] MS Project y Excel: importar y exportar.
+- [ ] Deswik y otros por CSV y DXF.
+- [ ] METSIM (simulación dinámica de pilas): exportar el plan; integrar, no construir.
+- [ ] Caterpillar RPMGlobal: referencia de la cadena integrada; CODEa cubre la cadena con sus propios módulos.","planning,ug,modulo:C3U,integracion","H4 Scheduler UG"
+"[Scheduler UG] Pruebas y criterios de aceptación","- [ ] Galería de 120 m a 4,5 m/día con disponibilidad 0,85: 31,4 días.
+- [ ] Red de 4 actividades A(5), B(3) después de A, C(4) después de A, D(2) después de B y C: ruta A-C-D de 11 días; holgura de B = 1.
+- [ ] Dos actividades con un mismo jumbo en el mismo día: la nivelación mueve la de menor prioridad.
+- [ ] Plan de 200 actividades con recursos nivelados y reporte mensual correcto.
+- [ ] Cambio de diseño que alarga una galería 20 m: duración sube y se marca.
+- [ ] Tonelaje por destino suma igual que el total del periodo.
+- [ ] Dependencia circular A-B-A: se rechaza.
+
+Criterios:
+- [ ] Plan de 200 actividades con recursos nivelados y reporte mensual correcto
+- [ ] Recalcular un plan de 2 000 actividades en menos de 10 segundos
+- [ ] Ruta crítica coincide con la de MS Project en un caso de prueba
+- [ ] El cambio de diseño actualiza duraciones sin reingreso manual","planning,ug,modulo:C3U,pruebas","H4 Scheduler UG"
+"[Stope Optimizer] Modelo de datos y migraciones","Entidades: ParametrosOptimizacion, Metodo, Corrida, Forma, Pilar, Escenario, Dominio, ConversionDiseno.
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,datos","H5 Stope Optimizer"
+"[Stope Optimizer] Parámetros","- [ ] Ley de corte por equilibrio con precio, costos y recuperación
+- [ ] Ancho mínimo, largo mínimo y máximo, altura y buzamiento mínimo por método
+- [ ] Espaciado entre subniveles y altura del tajeo
+- [ ] Dilución por pared (ELOS) y por contacto
+- [ ] Pilares: tamaño mínimo entre tajeos y verificación de factor de seguridad
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Optimización de formas","- [ ] Optimización de formas de tajeo por ley de corte para tajeo por subniveles en vetas
+- [ ] Varios métodos de minado: subniveles, corte y relleno, cámaras y pilares
+- [ ] Selección de la mejor combinación sin traslape por programación dinámica
+- [ ] Suavizado entre formas contiguas
+- [ ] Valor por forma con costos fijos de desarrollo y variables
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Escenarios","- [ ] Escenarios de precio y de ley de corte con comparación
+- [ ] Selección y comparación de disposiciones de tajeos con la mejor ley de corte
+- [ ] Curva tonelaje-valor por ley de corte
+- [ ] Escenarios con distintas dimensiones y métodos
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Pilares","- [ ] Optimización de pilares: ancho que equilibra mineral perdido y seguridad
+- [ ] Esfuerzo del pilar por área tributaria y factor de seguridad
+- [ ] Reglas de pilares por dominio geotécnico
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Diseño automático","- [ ] Convertir cada forma en un tajeo con sólido editable en Designer UG
+- [ ] Generar accesos, subniveles y cortes de perforación a partir de la forma
+- [ ] Preparación de la lista de labores de desarrollo y sus metros
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Reservas","- [ ] Reporte de tonelaje y ley por forma y por nivel
+- [ ] Datos para Reserves UG con dilución y pérdida
+- [ ] Reporte de metros de desarrollo por tonelada
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Visor y exportes","- [ ] Visor 3D con las formas coloreadas por valor
+- [ ] Exportar sólidos a DXF y OMF
+
+Ver ficha 05_Stope_Optimizer.md.","planning,ug,modulo:C2,funcionalidad","H5 Stope Optimizer"
+"[Stope Optimizer] Pantallas","- [ ] Parámetros de optimización
+- [ ] Corrida y progreso
+- [ ] Visor 3D de formas
+- [ ] Tabla de formas con tonelaje, ley, valor y dilución
+- [ ] Curva tonelaje-valor por ley de corte
+- [ ] Comparación de escenarios
+- [ ] Pilares: esfuerzo y factor de seguridad
+- [ ] Convertir a diseño en Designer
+- [ ] Historial de corridas","planning,ug,modulo:C2,ui","H5 Stope Optimizer"
+"[Stope Optimizer] Integraciones","- [ ] DXF y OMF para formas.
+- [ ] Importar el formato de salida de optimizadores externos (Datamine MSO, Deswik SO) como sólidos DXF: integrar, no construir su formato.","planning,ug,modulo:C2,integracion","H5 Stope Optimizer"
+"[Stope Optimizer] Pruebas y criterios de aceptación","- [ ] Ley de corte con Cm 35, Cp 18, Cg 7, P 60, Cv 0,5, R 0,90: 1,12 g/t.
+- [ ] Tajeo con paredes de 400 m2 y ELOS 0,5 m a 2,8 t/m3: 1 120 t de dilución.
+- [ ] Veta de 1,2 m con ancho mínimo 2,0 m: forma de 2,0 m y dilución por 0,8 m.
+- [ ] DP de 3 formas candidatas con valores 10, 8 y 12 donde la 1 y la 2 se traslapan y la 2 y la 3 no: elige 1 y 3 con 22.
+- [ ] Pilar con sigma_v 12 MPa y e = 0,6: sigma_p = 30 MPa; con resistencia 45 MPa, FS 1,5.
+- [ ] 100 % de las formas cumple ancho mínimo en un modelo de prueba.
+
+Criterios:
+- [ ] 100 % de formas cumplen el ancho mínimo y el pilar mínimo
+- [ ] Valor total igual (+-1 %) a la hoja de referencia de un caso de prueba
+- [ ] Corrida de 200 000 bloques en menos de 5 minutos
+- [ ] Conversión a Designer UG sin pérdida de volumen mayor a 1 %","planning,ug,modulo:C2,pruebas","H5 Stope Optimizer"
+"[Blend UG] Modelo de datos y migraciones","Entidades: FuenteMezcla, LímitePlanta, CapacidadTransporte, PlanMezcla, VersiónMezcla, RestricciónActiva, Escenario, DespachoMercado, AlimentaciónReal, NivelTraspaso.
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,datos","H6 Blend UG"
+"[Blend UG] Modelo de mezcla subterránea","- [ ] Fuentes: tajeos, frentes de avance y acopios de interior con tonelaje disponible y ley por periodo
+- [ ] Restricciones de planta: ley mínima y máxima, dureza, contaminantes y tonelaje de alimentación (GEOVIA MineSched: secuencias, recursos, mezclas y destinos para UG)
+- [ ] Restricciones de transporte: capacidad del pique, de chimeneas de traspaso, de tolvas y de camiones de bajo perfil
+- [ ] Disponibilidad por tajeo según relleno, ventilación y sostenimiento
+- [ ] Reglas de campo: no mezclar dos tajeos de contaminante alto en la misma guardia
+- [ ] Objetivos configurables: metal, desvío de ley, costo
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Optimización de mezclas y flujo","- [ ] Optimizar la mezcla y el flujo de material por la red de labores, pique, tolvas y planta (Deswik Blend)
+- [ ] Resolver con solver estándar para varios periodos a la vez
+- [ ] Mostrar qué restricción limita el resultado y su costo sombra
+- [ ] Comparar escenarios de mezcla (sin un tajeo, con un acopio adicional)
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Cadena de mina a mercado","- [ ] Seguir tonelaje y ley desde el tajeo hasta el despacho de concentrado o venta, con acopios en cada etapa (Deswik BOLT: cadena de mina a mercado)
+- [ ] Cumplimiento de calidad contractual de la venta: ley mínima y contaminantes con penalidad
+- [ ] Programa de despachos por periodo con stock entre mina, planta y puerto, de alcance básico por mezclas y despachos
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Plan de alimentación y destinos","- [ ] Plan de alimentación por periodo con tonelaje, ley, dureza y contaminantes
+- [ ] Destinos por fuente: planta, acopio de interior, desmonte, relleno
+- [ ] Exportar el plan a Metso Digital Production Management (antes Geminex) como entrada a la planificación de planta
+- [ ] Plan del turno para el despacho con orden de tajeos y frentes
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Ajuste y seguimiento","- [ ] Re-optimizar por guardia con lo realmente extraído y el estado de chimeneas y tolvas
+- [ ] Comparar mezcla real y planificada por periodo
+- [ ] Alertas cuando un tajeo se agota o una chimenea de traspaso llega a su límite
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Trabajo sin señal","- [ ] Ver el plan del turno y registrar fuentes agotadas desde tablet bajo tierra, con cola de cambios
+- [ ] Al volver la señal la re-optimización toma lo registrado; si dos usuarios cambian la misma fuente, prevalece el último y se avisa
+
+Ver ficha 06_Blend_UG.md.","planning,ug,modulo:PLA2U,funcionalidad","H6 Blend UG"
+"[Blend UG] Pantallas","- [ ] Fuentes del periodo: tajeos, frentes y acopios con tonelaje y ley
+- [ ] Límites de planta: ley, dureza, contaminantes y capacidad
+- [ ] Capacidad de transporte: pique, chimeneas de traspaso, tolvas y camiones de bajo perfil
+- [ ] Resultado de mezcla: toneladas por fuente y periodo con ley resultante
+- [ ] Restricciones activas: cuáles limitan el plan y cuánto valen
+- [ ] Escenarios: comparación entre mezclas alternativas
+- [ ] Cadena mina a mercado: stock y despacho por periodo
+- [ ] Plan de alimentación: tabla a exportar a planta
+- [ ] Plan del turno en tablet sin señal: fuentes, orden y registro de agotadas","planning,ug,modulo:PLA2U,ui","H6 Blend UG"
+"[Blend UG] Integraciones","- [ ] Metso Digital Production Management (antes Geminex): exportar el plan de alimentación por periodo; DPM planifica la planta y CODEa entrega el mineral planificado desde la mina subterránea.
+- [ ] Solver estándar (HiGHS, OR-Tools, scipy): integrar, no construir.
+- [ ] Tarifas y penalidades de contratos de venta: se cargan como datos; validar con el contrato vigente.
+- [ ] Sensores de nivel de tolva o de pesaje: solo se importan sus lecturas.","planning,ug,modulo:PLA2U,integracion","H6 Blend UG"
+"[Blend UG] Pruebas y criterios de aceptación","- [ ] 400 t a 9,0 g/t y 600 t a 5,0 g/t: ley de mezcla 6,6 g/t.
+- [ ] 500 t a 0,8 % As y 500 t a 0,2 % As: 0,5 %; con límite 0,6 % cumple, con límite 0,4 % se rechaza.
+- [ ] Pique de 90 t/h, 6 h y disponibilidad 0,85: 459 t por turno; plan de 600 t reduce a 459 t.
+- [ ] 460 t por turno con camiones de 12 t y 10 viajes: se piden 4 camiones.
+- [ ] Chimenea con capacidad 800 t, nivel 700 t e ingreso de 300 t sin extracción: ingreso limitado a 100 t.
+- [ ] Tajeo de 9,0 g/t marcado agotado sin señal: al sincronizar, la mezcla se recalcula sin esa fuente.
+- [ ] Plan exportado a Metso DPM con 31 periodos diarios: 31 filas con tonelaje, ley, dureza y contaminantes.
+
+Criterios:
+- [ ] El plan semanal de 20 fuentes se resuelve en menos de 60 segundos.
+- [ ] Ningún plan aprobado viola un límite sin justificación.
+- [ ] El plan exportado coincide con el plan aprobado en tonelaje y ley.
+- [ ] Sin señal no se pierde ningún registro de fuente agotada.","planning,ug,modulo:PLA2U,pruebas","H6 Blend UG"
+"[Cave Planner] Modelo de datos y migraciones","Entidades: Huella, PuntoExtraccion, Columna, PlanTiraje, TirajeReal, ParametrosDilucion, LimiteTasa, ReconciliacionLey, ResultadoFlujo.
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,datos","H7 Cave Planner"
+"[Cave Planner] Huella y puntos","- [ ] Selección de huella y nivel óptimo para minas por hundimiento por valor de columnas
+- [ ] Huella (footprint) y malla de puntos de extracción por nivel de producción
+- [ ] Radio hidráulico de la huella y comprobación contra hundibilidad
+- [ ] Diseño de huella y planificación de minería por hundimiento
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Columnas y valor","- [ ] Columna de mineral sobre cada punto desde el modelo de bloques
+- [ ] Tonelaje y ley de cabeza por punto
+- [ ] Flujo de mineral en el tiraje por punto de extracción para block caving y sublevel caving
+- [ ] Altura económica de columna
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Programa de tiraje","- [ ] Plan de tiraje por punto y periodo con tasa máxima
+- [ ] Control de tiraje uniforme entre vecinos
+- [ ] Programa de apertura de puntos y secuencia de hundimiento
+- [ ] Programación de producción con restricciones de extracción
+- [ ] Programa que equilibra corto y largo plazo
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Dilución","- [ ] Entrada de dilución por punto con punto de entrada configurable
+- [ ] Reconciliación de ley real contra predicha por punto
+- [ ] Importar resultados de simulación de flujo de tiraje (MassFlow) como referencia
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Control diario","- [ ] Control diario de tiraje por punto y turno
+- [ ] Comparación del tiraje real (Shift) con el plan
+- [ ] Alertas por punto fuera de rango
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Reportes","- [ ] Reporte por periodo de tonelaje, ley y dilución por sector
+- [ ] Entrega a Scheduler UG y Short-Term Planner UG
+- [ ] Mapas de calor de tiraje y ley
+
+Ver ficha 07_Cave_Planner.md.","planning,ug,modulo:PLA3,funcionalidad","H7 Cave Planner"
+"[Cave Planner] Pantallas","- [ ] Huella y malla de puntos
+- [ ] Columnas de mineral por punto
+- [ ] Selección de huella y nivel
+- [ ] Plan de tiraje por punto
+- [ ] Control diario por turno
+- [ ] Dilución y reconciliación
+- [ ] Mapa de calor del nivel de producción
+- [ ] Reporte por sector
+- [ ] Importar simulación de flujo","planning,ug,modulo:PLA3,ui","H7 Cave Planner"
+"[Cave Planner] Integraciones","- [ ] Itasca MassFlow: importar resultados de simulación de flujo de tiraje; integrar, no construir el simulador.
+- [ ] PCBC, PCSLC, CaveLogic, Deswik Caving: se toma su alcance como referencia; importar sus tablas por CSV.
+- [ ] CSV y DXF para huellas y puntos.","planning,ug,modulo:PLA3,integracion","H7 Cave Planner"
+"[Cave Planner] Pruebas y criterios de aceptación","- [ ] Columna 60 x 15 x 15 m a 2,7 t/m3: 36 450 t y entrada de dilución a 25 515 t con 70 %.
+- [ ] Huella de 200 x 200 m: radio hidráulico 50 m.
+- [ ] Plan de 100 puntos con tonelaje y ley de cabeza iguales (+-2 %) a una hoja de control.
+- [ ] Punto con tasa mayor al límite: se marca.
+- [ ] Tiraje real mayor que la columna: error.
+- [ ] Dos vecinos con diferencia de altura mayor al parámetro: alerta.
+
+Criterios:
+- [ ] Plan de tiraje de 100 puntos con tonelaje y ley de cabeza iguales (+-2 %) a una hoja de control
+- [ ] Reconciliación por punto con error medio calculado
+- [ ] Control diario sin pérdida de datos con tablet offline","planning,ug,modulo:PLA3,pruebas","H7 Cave Planner"

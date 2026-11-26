@@ -8,6 +8,8 @@ prueba de sus fichas.
 
 ## Correr
 
+Probado con Node 24 y pnpm 11 (`npm i -g pnpm` si falta).
+
 ```bash
 pnpm install
 pnpm dev        # http://localhost:5173
@@ -30,6 +32,12 @@ Para volver al estado inicial: borrar el almacenamiento del sitio.
 | Cumplimiento | `#/stp/cumplimiento` | Plan contra real por labor, guardia y supervisor; Pareto de causas |
 | Guardia en tablet | `#/stp/tablet` | Vista del jefe de guardia; marcas sin señal en cola, sincronización sin duplicar |
 | Reprogramación | `#/stp/reprogramar` | Arrastre de pendientes y asignación sugerida por puntaje |
+| Archivos Deswik | `#/stp/intercambio` | Importar y exportar el programa en CSV |
+| Designer UG (H2) | `#/designer/labor`, `#/designer/tajeo`, `#/designer/proyecto` | Labor por tramos, tajeo paramétrico, proyecto y versiones, DXF |
+| Reserves UG (H3) | `#/reserves` | Reservas por tajeo, desarrollo, agregación y versiones |
+| Scheduler UG (H4) | `#/scheduler` | Programa de mina nivelado, Gantt, plan mensual, escenarios |
+| Stope Optimizer (H5) | `#/stope` | Formas de tajeo sobre el modelo de bloques, pilares, escenarios, conversión a Designer |
+| Blend UG (H6) | `#/blend` | Mezcla por guardia con solver HiGHS, costos sombra, aprobación y CSV |
 | Calculadoras | `#/modulo/<id>` | Designer, Reserves, Scheduler (CPM), Stope Optimizer (DP), Blend, Cave Planner |
 
 ## Estructura
@@ -43,3 +51,13 @@ src/screens/     pantallas
 src/ui/          kit de interfaz, visor 3D, sección longitudinal
 docs/            ROADMAP, RULES, DECISIONS, QUESTIONS, fichas
 ```
+
+## Documentación de origen
+
+- `docs/fuente/Plan_de_trabajo_Planning_UG.pdf`: plan de trabajo (hitos H0–H7).
+- `docs/fuente/backlog_codea-planning-ug.csv`: backlog de 74 issues.
+- `docs/fichas/`: las 7 fichas de módulo.
+- `docs/ROADMAP.md`: estado de cada hito y qué falta; `docs/QUESTIONS.md`: dudas para el ingeniero de minas;
+  `docs/DECISIONS.md` y `docs/RULES.md`: decisiones técnicas y origen de cada fórmula.
+
+Siguiente hito pendiente: H7 · Cave Planner.
